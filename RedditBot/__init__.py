@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(1, sys.path[0] + "/irctk")
+
 from irctk import Bot
 
 from RedditBot.config import Config
