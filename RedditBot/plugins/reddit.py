@@ -71,7 +71,7 @@ def karma(context):
         'link': redditor['link_karma'],
         'comment': redditor['comment_karma'],
     }
-    line = '{redditor} has {link} link and {comment} comment karma'.format(**info)
+    line = u'{redditor} has {link} link and {comment} comment karma'.format(**info)
     return line
 
 
@@ -94,7 +94,7 @@ def announce_reddit(context):
         'down': submission['downs'],
         'shortlink': 'http://redd.it/' + submission['id']
     }
-    line = '\'{title}\' - +{up}/-{down} - {shortlink}'.format(**info)
+    line = u'\'{title}\' - +{up}/-{down} - {shortlink}'.format(**info)
     if context.line['regex_search'].group(3):
         # Link to comment
         return '[Comment] ' + line
