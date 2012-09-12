@@ -1,0 +1,3 @@
+[submodule "irctk"]
+	path = irctk
+	url = git://github.com/buttscicles/irctk.git
