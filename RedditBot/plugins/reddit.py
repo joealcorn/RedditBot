@@ -1,22 +1,9 @@
-from RedditBot import bot
+from RedditBot import bot, utils
 
 import re
-import requests
 
 reddit_link = re.compile('http://(?:www\.)?redd(?:\.it/|it\.com/(?:tb|(?:r/[\w\.]+/)?comments)/)(\w+)(/.+/)?(\w{7})?')
-headers = {'User-Agent': 'irc.gamesurge.net #redditmc/RedditBot'}
 
-
-def make_request(url):
-    try:
-        r = requests.get(url, headers=headers)
-    except requests.exceptions.ConnectionError:
-        return 'Connection error'
-    except requests.exceptions.Timeout:
-        return 'Request timed out'
-    except:
-        return 'Unhandled exception ({})'.format(r.status_code)
-    return r.json
 
 @bot.command
 def reddit(context):
@@ -29,7 +16,7 @@ def reddit(context):
         query_string = '?sort=new'
 
     url = 'http://www.reddit.com/r/{}.json{}'.format(subreddit, query_string)
-    submission = make_request(url)
+    submission = utils.make_request_json(url)
     if isinstance(submission, dict):
         try:
             submission = submission['data']['children'][0]['data']
@@ -57,7 +44,7 @@ def karma(context):
         return 'Usage: .karma <redditor>'
 
     url = 'http://www.reddit.com/user/{}/about.json'.format(redditor)
-    redditor = make_request(url)
+    redditor = utils.make_request_json(url)
     if isinstance(redditor, dict):
         try:
             redditor = redditor['data']
@@ -79,7 +66,7 @@ def karma(context):
 def announce_reddit(context):
     submission_id = context.line['regex_search'].group(1)
     url = 'http://www.reddit.com/comments/{}.json'.format(submission_id)
-    submission = make_request(url)
+    submission = utils.make_request_json(url)
     if isinstance(submission, list):
         try:
             submission = submission[0]['data']['children'][0]['data']
