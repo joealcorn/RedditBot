@@ -12,4 +12,4 @@ bot = Bot()
 bot.config.from_object(Config)
 
 # load our plugins
-from RedditBot.plugins import reddit
+from RedditBot.plugins import reddit, twitter
