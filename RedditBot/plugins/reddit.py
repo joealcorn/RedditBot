@@ -8,15 +8,15 @@ reddit_link = re.compile('http://(?:www\.)?redd(?:\.it/|it\.com/(?:tb|(?:r/[\w\.
 @bot.command
 def reddit(context):
     subreddit = context.args.strip().split(' ')[0]
-    query_string = ''
+    params = {}
     if subreddit is '':
         return 'Usage: .reddit <subreddit>'
     elif subreddit.lower().endswith(('/new', '/new/')):
         # reddit occasionally returns fuck all if the query string is not added
-        query_string = '?sort=new'
+        params = {'sort': 'new'}
 
-    url = 'http://www.reddit.com/r/{}.json{}'.format(subreddit, query_string)
-    submission = utils.make_request_json(url)
+    url = 'http://www.reddit.com/r/{}.json'.format(subreddit)
+    submission = utils.make_request_json(url, params)
     if isinstance(submission, dict):
         try:
             submission = submission['data']['children'][0]['data']
