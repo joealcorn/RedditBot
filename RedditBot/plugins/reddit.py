@@ -12,6 +12,8 @@ def reddit(context):
     params = {}
     if subreddit is '':
         return 'Usage: .reddit <subreddit>'
+    elif subreddit.lower().endswith(('clop','spacedicks')):
+        return 'No'
     elif subreddit.lower().endswith(('/new', '/new/')):
         # reddit occasionally returns fuck all if the query string is not added
         params = {'sort': 'new'}
