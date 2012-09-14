@@ -13,4 +13,4 @@ bot = Bot()
 bot.config.from_object(Config)
 
 # load our plugins
-from RedditBot.plugins import reddit, twitter, utils, youtube
+from RedditBot.plugins import reddit, twitter, botutils, youtube
