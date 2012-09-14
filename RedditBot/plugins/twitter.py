@@ -24,7 +24,7 @@ def announce_tweet(context):
 
 @bot.command
 def twitter(context):
-    ''' Gets the latest tweet for a username '''
+    '''Usage: .twitter <username>'''
     username = context.args.strip().split(' ')[0]
     if username is '':
         return 'Usage: .twitter <username>'

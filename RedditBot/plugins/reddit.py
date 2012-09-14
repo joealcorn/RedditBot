@@ -7,6 +7,7 @@ reddit_link = re.compile('http://(?:www\.)?redd(?:\.it/|it\.com/(?:tb|(?:r/[\w\.
 
 @bot.command
 def reddit(context):
+    '''Usage: .reddit <subreddit>'''
     subreddit = context.args.strip().split(' ')[0]
     params = {}
     if subreddit is '':
@@ -39,6 +40,7 @@ def reddit(context):
 
 @bot.command
 def karma(context):
+    '''Usage: .karma <reddit_username>'''
     redditor = context.args.strip().split(' ')[0]
     if redditor is '':
         return 'Usage: .karma <redditor>'
