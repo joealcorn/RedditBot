@@ -17,10 +17,10 @@ def reddit(context):
         params = {'sort': 'new'}
 
     url = 'http://www.reddit.com/r/{}.json'.format(subreddit)
-    submission = utils.make_request_json(url, params)
-    if isinstance(submission, dict):
+    submission = utils.make_request(url, params)
+    if isinstance(submission.json, dict):
         try:
-            submission = submission['data']['children'][0]['data']
+            submission = submission.json['data']['children'][0]['data']
         except:
             return 'Could not fetch json, does that subreddit exist?'
     else:
@@ -46,10 +46,10 @@ def karma(context):
         return 'Usage: .karma <redditor>'
 
     url = 'http://www.reddit.com/user/{}/about.json'.format(redditor)
-    redditor = utils.make_request_json(url)
-    if isinstance(redditor, dict):
+    redditor = utils.make_request(url)
+    if isinstance(redditor.json, dict):
         try:
-            redditor = redditor['data']
+            redditor = redditor.json['data']
         except:
             return 'Could not fetch json, does that user exist?'
     else:
@@ -68,10 +68,10 @@ def karma(context):
 def announce_reddit(context):
     submission_id = context.line['regex_search'].group(1)
     url = 'http://www.reddit.com/comments/{}.json'.format(submission_id)
-    submission = utils.make_request_json(url)
-    if isinstance(submission, list):
+    submission = utils.make_request(url)
+    if isinstance(submission.json, list):
         try:
-            submission = submission[0]['data']['children'][0]['data']
+            submission = submission.json[0]['data']['children'][0]['data']
         except Exception:
             return 'Could not fetch json'
     else:

@@ -13,12 +13,12 @@ def announce_tweet(context):
     ''' Announces tweets as they are posted in the channel '''
     tweet_id = context.line['regex_search'].group(2)
     url = status_url.format(tweet_id)
-    response = utils.make_request_json(url)
-    if not isinstance(response, dict):
+    response = utils.make_request(url)
+    if not isinstance(response.json, dict):
         return response
 
-    info = {'screen_name': response['user']['screen_name'],
-            'tweet': response['text']}
+    info = {'screen_name': response.json['user']['screen_name'],
+            'tweet': response.json['text']}
     return utils.unescape_html(line.format(**info))
 
 
@@ -30,12 +30,12 @@ def twitter(context):
         return 'Usage: .twitter <username>'
 
     params = {'screen_name': username, 'count': 1}
-    response = utils.make_request_json(latest_url, params)
-    if not isinstance(response, list):
+    response = utils.make_request(latest_url, params)
+    if not isinstance(response.json, list):
         return response
     elif response == []:
         return 'No results found for that name'
 
-    info = {'screen_name': response[0]['user']['screen_name'],
-            'tweet': response[0]['text']}
+    info = {'screen_name': response.json[0]['user']['screen_name'],
+            'tweet': response.json[0]['text']}
     return utils.unescape_html(line.format(**info))

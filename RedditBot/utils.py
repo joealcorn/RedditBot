@@ -7,15 +7,18 @@ import requests
 headers = {'User-Agent': 'irc.gamesurge.net #redditmc/RedditBot'}
 timeout = 5
 
+
 def isadmin(prefix, bot):
     admins = bot.config.get('ADMINS', [])
     return any(imap(lambda x: glob(x).matches(prefix), admins))
+
 
 def isignored(prefix, bot):
     ignore = bot.config.get('IGNORE', [])
     return any(imap(lambda x: glob(x).matches(prefix), ignore))
 
-def make_request_json(url, params={}):
+
+def make_request(url, params={}):
     try:
         r = requests.get(url, params=params, headers=headers, timeout=timeout)
     except requests.exceptions.ConnectionError:
@@ -27,8 +30,8 @@ def make_request_json(url, params={}):
     except requests.exceptions.TooManyRedirects:
         return 'Too many redirects'
     except:
-        return 'Unhandled exception ({})'.format(r.status_code)
-    return r.json
+        return 'Unhandled exception'
+    return r
 
 
 def unescape_html(string):
