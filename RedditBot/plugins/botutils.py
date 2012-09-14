@@ -75,7 +75,7 @@ def eval(context):
         try:
             return str(__builtin__.eval(args))
         except:
-            return str(sys.exc_info()[0])
+            return repr(sys.exc_info()[1])
     else:
         return eval.__doc__
 
