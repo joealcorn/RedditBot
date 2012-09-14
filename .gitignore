@@ -1,3 +1,6 @@
+
+bot_ignore.txt
+
 *.py[co]
 
 # Packages
