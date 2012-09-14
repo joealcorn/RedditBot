@@ -20,13 +20,13 @@ class glob(object):
     @staticmethod
     def str_to_tuple(nick_user_host):
         '''Convert a "nick!user@host" to (nick, user, host)'''
-        return re.match(nick_user_host_re, nick_user_host).groups()
+        return re.match(nick_user_host_re, nick_user_host, re.I).groups()
     
     @staticmethod
     def pattern_to_re(pattern):
         '''Convert a glob pattern to a regex'''
         r = ''
-        for bit in re.finditer(r'(?:[^\?\*]+|\?+|\*+)', pattern):
+        for bit in re.finditer(r'(?:[^\?\*]+|\?+|\*+)', pattern, re.I):
             if bit.group().startswith("*"):
                 r += '[^!@]*'
             elif bit.group().startswith("?"):
@@ -40,7 +40,7 @@ class glob(object):
     @staticmethod
     def matches_piece(pattern, thing):
         '''Return True if thing matches pattern'''
-        return re.match(glob.pattern_to_re(pattern), thing) != None
+        return re.match(glob.pattern_to_re(pattern), thing, re.I) != None
     
     def matches(self, test):
         '''Return True if 'test' is matched by the pattern we represent'''
@@ -51,7 +51,7 @@ class glob(object):
     def pattern_to_super_re(pattern):
         '''Like glob.pattern_to_re but for superset testing'''
         r = ''
-        for bit in re.finditer(r'(?:[^\?\*]+|\?+|\*+)', pattern):
+        for bit in re.finditer(r'(?:[^\?\*]+|\?+|\*+)', pattern, re.I):
             if bit.group().startswith("*"):
                 r += '[^!@]*'
             elif bit.group().startswith("?"):
@@ -65,7 +65,7 @@ class glob(object):
     @staticmethod
     def issuper_piece(a, b):
         '''Like glob.matches_piece but for superset testing'''
-        return re.match(glob.pattern_to_super_re(a), b) != None
+        return re.match(glob.pattern_to_super_re(a), b, re.I) != None
     
     def issuper(self, other):
         '''Return True if the set of all nick!user@host matched by this glob is a superset of those matched by 'other\''''
