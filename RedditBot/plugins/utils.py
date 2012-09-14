@@ -3,6 +3,9 @@ from RedditBot import bot, utils
 
 from itertools import groupby
 
+import __builtin__
+import sys
+
 @bot.command('.')
 @bot.command('help')
 @bot.command
@@ -35,7 +38,7 @@ def raw(context):
     '''.raw <command>'''
     #if not context.line['prefix'] in bot.config.get('ADMINS', []):
     #    return
-    if not utils.isadmin(context.line['prefix']):
+    if not utils.isadmin(context.line['prefix'], bot):
         return
     if context.args:
         command = context.args.split(' ', 1)[0]
@@ -43,3 +46,20 @@ def raw(context):
         bot.irc.send_command(command, args)
     else:
         return raw.__doc__
+
+@bot.command
+def eval(context):
+    '''.eval <command>'''
+    #if not context.line['prefix'] in bot.config.get('ADMINS', []):
+    #    return
+    if not utils.isadmin(context.line['prefix'], bot):
+        return
+    if context.args:
+        command = context.args.split(' ', 1)[0]
+        args = context.args.split(' ', 1)[-1]
+        try:
+            return str(__builtin__.eval(args))
+        except:
+            return str(sys.exc_info()[0])
+    else:
+        return eval.__doc__
