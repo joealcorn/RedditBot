@@ -4,7 +4,10 @@ class Config(object):
     SSL = False
     TIMEOUT = 300
     NICK = 'RedditBot'
-    REALNAME = 'RedditBot - https://github.com/buttscicles/RedditBot'
+    REALNAME = 'https://github.com/buttscicles/RedditBot'
     CHANNELS = ['#RedditMC']
 
-    ADMINS = ['*!*@AlcoJew.staff.reddit-minecraft', '*!joe@buttscicl.es', '*!edk141@edk141.co.uk', '*!*@edk141.staff.reddit-minecraft']
+    ADMINS = ['*!*@AlcoJew.staff.reddit-minecraft',
+              '*!joe@buttscicl.es',
+              '*!edk141@edk141.co.uk',
+              '*!*@edk141.staff.reddit-minecraft']
