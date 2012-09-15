@@ -16,6 +16,8 @@ nerd_nu = [
 
 isup_re = re.compile(r'is (\w+) (?:up|down)', re.I)
 
+server_re = re.compile(r'^\s*([A-Za-z0-9_-]+\.[A-Za-z0-9_.-]+)(?::([0-9]{1,5}))?\s*$')
+
 def get_info(host, port):
     try:
         #Set up our socket
@@ -88,7 +90,11 @@ def is_x_up(context):
 def isup(context):
     server = find_server(context.args)
     if not server:
-        return
+        match = server_re.match(context.args)
+        print match
+        if not match:
+            return
+        server = (match.group(1), match.group(2) or 25565, 'players')
     info = get_info(server[0], server[1])
     if info:
         return '{0} is online with {players}/{max_players} {1} online.'.format(server[0], server[2], **info)
