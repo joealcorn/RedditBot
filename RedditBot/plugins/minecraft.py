@@ -69,6 +69,7 @@ def minecraft_status(context):
 
 @bot.command
 def status(context):
+    '''Usage: .status'''
     servers = map(lambda x: {'info': get_info(x[0], x[1]), 'server': x}, nerd_nu)
     servers = map(lambda x:
         '{motd}: [{players}/{max_players}]'.format(x['server'][0], **x['info'])
@@ -88,6 +89,7 @@ def is_x_up(context):
 
 @bot.command
 def isup(context):
+    '''Usage: .isup <MC server address>'''
     server = find_server(context.args)
     if not server:
         match = server_re.match(context.args)
