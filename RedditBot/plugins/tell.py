@@ -54,6 +54,8 @@ def tellinput(context):
 
         return '{0}: See {1} for your messages.'.format(nick, p['url'])
     else:
+        db.execute('delete from tell where user_to=lower(?)', (nick,))
+        db.commit()
         return '\n'.join(imap(lambda x: '{0}: {1}'.format(nick, x), reply))
 
 @bot.command
