@@ -83,7 +83,7 @@ def tells(context):
 
     p = paste('\n'.join(reply), 'Notes for {}'.format(nick), unlisted=1)
     if p['success'] == False:
-        bot.reply('Could not paste notes', context.line, False, True, context.line['user'])
+        bot.reply('Could not paste notes: {}'.format(p['error']), context.line, False, True, context.line['user'])
         return
     else:
         bot.reply(p['url'], context.line, False, True, context.line['user'])
