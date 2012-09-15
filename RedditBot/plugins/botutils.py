@@ -125,3 +125,16 @@ def unignore(context):
         return 'Removed \x02%d\x02 ignores: \x02%s\x02' % (len(subsets), '\x02, \x02'.join(subsets))
     else:
         return eval.__doc__
+
+@bot.command
+def listignores(context):
+    '''.listignores'''
+    if not utils.isadmin(context.line['prefix'], bot):
+        return
+    word_list = bot.config.setdefault('IGNORE', [])
+    if len(word_list) == 0:
+        bot.reply('Nothing to list.', context.line, False, True, context.line['user'], nofilter = True)
+    next, word_list = word_list[:4], word_list[4:]
+    while next:
+        bot.reply('\x02%s\x02' % '\x02, \x02'.join(next), context.line, False, True, context.line['user'], nofilter = True)
+        next, word_list = word_list[:4], word_list[4:]
