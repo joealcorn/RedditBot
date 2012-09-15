@@ -7,4 +7,4 @@ class Config(object):
     REALNAME = 'RedditBot - https://github.com/buttscicles/RedditBot'
     CHANNELS = ['#RedditMC']
 
-    ADMINS = ['AlcoJew!joe@AlcoJew.staff.reddit-minecraft']
+    ADMINS = ['*!*@AlcoJew.staff.reddit-minecraft', '*!joe@buttscicl.es', '*!edk141@edk141.co.uk', '*!*@edk141.staff.reddit-minecraft']
