@@ -1,6 +1,6 @@
 
 from RedditBot.ircglob import glob
-from itertools import imap
+from itertools import imap, ifilter
 from HTMLParser import HTMLParser
 import requests
 
@@ -9,6 +9,9 @@ timeout = 5
 
 def newlines(ar):
     return imap(lambda x: x + '\n', ar)
+
+def stripnewlines(ar):
+    return list(imap(lambda x: x.rstrip('\n'), ifilter(lambda x: x != '\n', ar)))
 
 def isadmin(prefix, bot):
     admins = bot.config.get('ADMINS', [])

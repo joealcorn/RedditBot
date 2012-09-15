@@ -6,14 +6,11 @@
 import irctk.bot
 import irctk.plugins
 
-import importlib
-
 from RedditBot.ircglob import glob
 from RedditBot.utils import isignored, isadmin
 
 class PluginHandler(irctk.plugins.PluginHandler):    
     def enqueue_plugin(self, plugin, hook, context, regex=False):
-        importlib.import_module('RedditBot.utils')
         prefix = plugin['context']['prefix']
         if isignored(prefix, self.bot) and not isadmin(prefix, self.bot):
             return
@@ -30,8 +27,13 @@ class Bot(irctk.bot.Bot):
     
     def reply(self, message, context, action=False, notice=False,
             recipient=None, line_limit=400, **kwargs):
+        # deal with reply hook for badwords
         if not kwargs.get('nofilter', False) and self.reply_hook:
             message = self.reply_hook(message)
         if not message:
             return
-        return super(Bot, self).reply(message, context, action, notice, recipient, line_limit)
+        
+        # split into lines
+        for message in message.split('\n'):
+            message = message.rstrip('\r')
+            super(Bot, self).reply(message, context, action, notice, recipient, line_limit)

@@ -19,9 +19,8 @@ def save_badwords():
             f.writelines(utils.newlines(badwords))
 
 if os.path.exists('bot_badword.txt'):
-    global badwords
     with open('bot_badword.txt', 'r') as f:
-        badwords = f.readlines()
+        badwords = utils.stripnewlines(f.readlines())
 
 def reply_hook(message):
     bad_re = list(imap(lambda x: re.compile(re.escape(x), re.I), badwords))
@@ -60,6 +59,7 @@ def delbadword(context):
 @bot.command
 def listbadwords(context):
     global badwords
+    print badwords
     if not utils.isadmin(context.line['prefix'], bot):
         return
     word_list = list(badwords)

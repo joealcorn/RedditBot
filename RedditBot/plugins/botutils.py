@@ -19,7 +19,7 @@ def save_ignores():
 
 if os.path.exists('bot_ignore.txt'):
     with open('bot_ignore.txt', 'r') as f:
-        bot.config['IGNORE'] = f.readlines()
+        bot.config['IGNORE'] = utils.stripnewlines(f.readlines())
 
 @bot.command('.')
 @bot.command('help')
