@@ -32,6 +32,7 @@ bot.set_reply_hook(reply_hook)
 
 @bot.command
 def addbadword(context):
+    '''.addbadword <word>'''
     global badwords
     if not utils.isadmin(context.line['prefix'], bot):
         return
@@ -48,6 +49,7 @@ def addbadword(context):
 
 @bot.command
 def delbadword(context):
+    '''.delbadword <word>'''
     global badwords
     if not utils.isadmin(context.line['prefix'], bot):
         return
@@ -58,8 +60,8 @@ def delbadword(context):
 
 @bot.command
 def listbadwords(context):
+    '''.listbadwords'''
     global badwords
-    print badwords
     if not utils.isadmin(context.line['prefix'], bot):
         return
     word_list = list(badwords)
