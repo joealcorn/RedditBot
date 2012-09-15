@@ -15,7 +15,7 @@ def save_ignores():
     print 'Saving the ignore list...'
     with save_ignores_lock:
         with open('bot_ignore.txt', 'w') as f:
-            f.writelines(bot.config.setdefault('IGNORE', []))
+            f.writelines(utils.newlines(bot.config.setdefault('IGNORE', [])))
 
 if os.path.exists('bot_ignore.txt'):
     with open('bot_ignore.txt', 'r') as f:
@@ -70,10 +70,8 @@ def eval(context):
     if not utils.isadmin(context.line['prefix'], bot):
         return
     if context.args:
-        command = context.args.split(' ', 1)[0]
-        args = context.args.split(' ', 1)[-1]
         try:
-            return str(__builtin__.eval(args))
+            return str(__builtin__.eval(context.args))
         except:
             return repr(sys.exc_info()[1])
     else:

@@ -7,6 +7,9 @@ import requests
 headers = {'User-Agent': 'irc.gamesurge.net #redditmc/RedditBot'}
 timeout = 5
 
+def newlines(ar):
+    return imap(lambda x: x + '\n', ar)
+
 def isadmin(prefix, bot):
     admins = bot.config.get('ADMINS', [])
     return any(imap(lambda x: glob(x).matches(prefix), admins))
