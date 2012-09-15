@@ -31,4 +31,4 @@ def google(context):
 
     # finally return the result to the channel or user the plugin was called
     # from
-    return ret
+    return '{0}: {1}'.format(context.line['user'], ret)
