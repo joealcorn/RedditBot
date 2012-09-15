@@ -59,7 +59,7 @@ def get_video_description(vid_id):
 @bot.regex(youtube_re)
 def youtube_url(context):
     vid_id = context.line['regex_search'].groups()[0]
-    return get_video_description(vid_id)
+    return unicode(get_video_description(vid_id), 'utf8')
 
 
 @bot.command('y')
@@ -79,4 +79,4 @@ def youtube(context):
 
     vid_id = data['data']['items'][0]['id']
 
-    return get_video_description(vid_id) + ' - ' + video_url.format(vid_id)
+    return unicode(get_video_description(vid_id) + ' - ' + video_url.format(vid_id), 'utf8')
