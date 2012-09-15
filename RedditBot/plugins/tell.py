@@ -35,21 +35,27 @@ def tellinput(context):
     db_init(db)
 
     tells = get_tells(db, nick)
-    
+
     if len(tells) == 0:
         return
-    
-    db.execute('delete from tell where user_to=lower(?)', (nick,))
-    db.commit()
-    
+
     reply = []
     for user_from, message, time, chan in tells:
         d_time = datetime.fromtimestamp(time)
         reply.append('{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
-    
+
     if len(tells) > 2:
-        return '{0}: See {1} for your messages.'.format(nick, paste('\n'.join(reply), "RedditBot"))
+        p = paste('\n'.join(reply), 'Notes for {}'.format(nick))
+        if p['success'] == True:
+            db.execute('delete from tell where user_to=lower(?)', (nick,))
+            db.commit()
+        else:
+            return
+
+        return '{0}: See {1} for your messages.'.format(nick, p['url'])
     else:
+        db.execute('delete from tell where user_to=lower(?)', (nick,))
+        db.commit()
         return '\n'.join(imap(lambda x: '{0}: {1}'.format(nick, x), reply))
 
 @bot.command
@@ -63,22 +69,26 @@ def tells(context):
     db_init(db)
 
     tells = get_tells(db, nick)
-    
+
     if len(tells) == 0:
         return
-    
+
     db.execute('delete from tell where user_to=lower(?)', (nick,))
     db.commit()
-    
+
     reply = []
     for user_from, message, time, chan in tells:
         d_time = datetime.fromtimestamp(time)
         reply.append('{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
-    
-    if len(tells) > 2:
-        return '{0}: See {1} for your messages.'.format(nick, paste('\n'.join(reply), "RedditBot"))
+
+    p = paste('\n'.join(reply), 'Notes for {}'.format(nick))
+    if p['success'] == False:
+        bot.reply('Could not paste notes', context.line, False, True, context.line['user'])
+        return
     else:
-        return '\n'.join(imap(lambda x: '{0}: {1}'.format(nick, x), reply))
+        bot.reply(p['url'], context.line, False, True, context.line['user'])
+        return
+
 
 @bot.command
 def tell(context):

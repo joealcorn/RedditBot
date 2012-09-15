@@ -63,21 +63,6 @@ def raw(context):
         return raw.__doc__
 
 @bot.command
-def eval(context):
-    '''.eval <command>'''
-    #if not context.line['prefix'] in bot.config.get('ADMINS', []):
-    #    return
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
-    if context.args:
-        try:
-            return str(__builtin__.eval(context.args))
-        except:
-            return repr(sys.exc_info()[1])
-    else:
-        return eval.__doc__
-
-@bot.command
 def ignore(context):
     '''.ignore nick!user@host'''
     bot.config.setdefault('IGNORE', [])

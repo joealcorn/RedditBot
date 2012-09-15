@@ -26,9 +26,14 @@ def isignored(prefix, bot):
     return any(imap(lambda x: glob(x).matches(prefix), ignore))
 
 
-def make_request(url, params={}):
+def make_request(url, params={}, method='get'):
     try:
-        r = requests.get(url, params=params, headers=headers, timeout=timeout)
+        if method.lower() == 'post':
+            r = requests.post(url, data=params, headers=headers, timeout=timeout)
+        elif method.lower() == 'get':
+            r = requests.get(url, params=params, headers=headers, timeout=timeout)
+        else:
+            raise Exception('Unsupported HTTP Method')
     except requests.exceptions.ConnectionError:
         return 'Connection error'
     except requests.exceptions.Timeout:
@@ -37,8 +42,7 @@ def make_request(url, params={}):
         return 'HTTP Error'
     except requests.exceptions.TooManyRedirects:
         return 'Too many redirects'
-    except:
-        return 'Unhandled exception'
+
     return r
 
 
