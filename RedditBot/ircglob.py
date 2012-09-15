@@ -45,7 +45,7 @@ class glob(object):
                     r += '{%d}' % len(bit.group())
             else:
                 r += re.escape(bit.group())
-        return r
+        return '^%s$' % r
     
     @staticmethod
     def matches_piece(pattern, thing):
@@ -70,7 +70,7 @@ class glob(object):
                     r += '{%d}' % len(bit.group())
             else:
                 r += re.escape(bit.group())
-        return r
+        return '^%s$' % r
     
     @staticmethod
     def issuper_piece(a, b):
