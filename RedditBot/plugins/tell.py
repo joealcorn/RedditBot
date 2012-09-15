@@ -128,4 +128,4 @@ def tell(context):
         db.commit()
     except db.IntegrityError:
         return 'Message has already been queued.'
-    return '{0}: I\'ll tell {1} that when I see them.'.format(nick, user_to)
+    return '{0}: I\'ll tell {1} that when I see them.'.format(nick, query[0])
