@@ -31,6 +31,8 @@ def twitter(context):
     username = context.args.strip().split(' ')[0]
     if username is '':
         return 'Usage: .twitter <username>'
+    elif username.lower().lstrip('@') in blacklist:
+        return 'No'
 
     params = {'screen_name': username, 'count': 1}
     response = utils.make_request(latest_url, params)
@@ -41,6 +43,4 @@ def twitter(context):
 
     info = {'screen_name': response.json[0]['user']['screen_name'],
             'tweet': response.json[0]['text']}
-    if info['screen_name'].lower() in blacklist:
-        return 'No'
     return utils.unescape_html(line.format(**info))
