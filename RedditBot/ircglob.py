@@ -9,7 +9,14 @@ def matches(pattern, prefix):
 class glob(object):
     '''Represents a nick!user@host glob pattern'''
     def __init__(self, pattern):
-        (self.nick, self.user, self.host) = self.str_to_tuple(pattern)
+        try:
+            (self.nick, self.user, self.host) = self.str_to_tuple(pattern)
+        except:
+            raise Exception("Invalid nick!user@host pattern")
+    
+    @staticmethod
+    def is_valid(nick_user_host):
+        return glob.str_to_tuple(nick_user_host) != False
     
     def __eq__(self, other):
         return (self.nick, self.user, self.host) == (other.nick, other.user, other.host)
@@ -20,7 +27,10 @@ class glob(object):
     @staticmethod
     def str_to_tuple(nick_user_host):
         '''Convert a "nick!user@host" to (nick, user, host)'''
-        return re.match(nick_user_host_re, nick_user_host, re.I).groups()
+        match = re.match(nick_user_host_re, nick_user_host, re.I)
+        if not match:
+            return False
+        return match.groups()
     
     @staticmethod
     def pattern_to_re(pattern):

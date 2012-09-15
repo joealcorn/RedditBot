@@ -1,5 +1,6 @@
 
-bot_ignore.txt
+bot_*.txt
+*.db
 
 *.py[co]
 

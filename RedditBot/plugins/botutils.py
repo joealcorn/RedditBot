@@ -15,11 +15,11 @@ def save_ignores():
     print 'Saving the ignore list...'
     with save_ignores_lock:
         with open('bot_ignore.txt', 'w') as f:
-            f.writelines(bot.config.setdefault('IGNORE', []))
+            f.writelines(utils.newlines(bot.config.setdefault('IGNORE', [])))
 
 if os.path.exists('bot_ignore.txt'):
     with open('bot_ignore.txt', 'r') as f:
-        bot.config['IGNORE'] = f.readlines()
+        bot.config['IGNORE'] = utils.stripnewlines(f.readlines())
 
 @bot.command('.')
 @bot.command('help')
@@ -70,12 +70,10 @@ def eval(context):
     if not utils.isadmin(context.line['prefix'], bot):
         return
     if context.args:
-        command = context.args.split(' ', 1)[0]
-        args = context.args.split(' ', 1)[-1]
         try:
-            return str(__builtin__.eval(args))
+            return str(__builtin__.eval(context.args))
         except:
-            return str(sys.exc_info()[0])
+            return repr(sys.exc_info()[1])
     else:
         return eval.__doc__
 
@@ -127,3 +125,16 @@ def unignore(context):
         return 'Removed \x02%d\x02 ignores: \x02%s\x02' % (len(subsets), '\x02, \x02'.join(subsets))
     else:
         return eval.__doc__
+
+@bot.command
+def listignores(context):
+    '''.listignores'''
+    if not utils.isadmin(context.line['prefix'], bot):
+        return
+    word_list = bot.config.setdefault('IGNORE', [])
+    if len(word_list) == 0:
+        bot.reply('Nothing to list.', context.line, False, True, context.line['user'], nofilter = True)
+    next, word_list = word_list[:4], word_list[4:]
+    while next:
+        bot.reply('\x02%s\x02' % '\x02, \x02'.join(next), context.line, False, True, context.line['user'], nofilter = True)
+        next, word_list = word_list[:4], word_list[4:]
