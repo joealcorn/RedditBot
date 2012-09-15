@@ -3,6 +3,7 @@ from RedditBot import bot, utils
 import re
 
 reddit_link = re.compile('http://(?:www\.)?redd(?:\.it/|it\.com/(?:tb|(?:r/[\w\.]+/)?comments)/)(\w+)(/.+/)?(\w{7})?')
+blacklist = ['spacedicks', 'clopclop', 'spaceclop']
 
 
 @bot.command
@@ -12,8 +13,8 @@ def reddit(context):
     params = {}
     if subreddit is '':
         return 'Usage: .reddit <subreddit>'
-    elif subreddit.lower().endswith(('clop','spacedicks')):
-        return 'No'
+    elif subreddit.lower().split('/')[0] in blacklist:
+        return 'No.'
     elif subreddit.lower().endswith(('/new', '/new/')):
         # reddit occasionally returns fuck all if the query string is not added
         params = {'sort': 'new'}
