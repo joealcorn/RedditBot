@@ -12,7 +12,7 @@ from RedditBot.utils import isignored, isadmin
 class PluginHandler(irctk.plugins.PluginHandler):    
     def enqueue_plugin(self, plugin, hook, context, regex=False):
         prefix = plugin['context']['prefix']
-        if isignored(prefix, self.bot) and not isadmin(prefix, self.bot):
+        if glob.is_valid(prefix) and isignored(prefix, self.bot) and not isadmin(prefix, self.bot):
             return
         super(PluginHandler, self).enqueue_plugin(plugin, hook, context, regex)
 
