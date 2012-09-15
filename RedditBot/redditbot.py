@@ -21,5 +21,17 @@ class PluginHandler(irctk.plugins.PluginHandler):
 
 class Bot(irctk.bot.Bot):
     def __init__(self):
+        self.reply_hook = None
         super(Bot, self).__init__()
         self.plugin = PluginHandler(self)
+    
+    def set_reply_hook(self, hook):
+        self.reply_hook = hook
+    
+    def reply(self, message, context, action=False, notice=False,
+            recipient=None, line_limit=400, **kwargs):
+        if not kwargs.get('nofilter', False) and self.reply_hook:
+            message = self.reply_hook(message)
+        if not message:
+            return
+        return super(Bot, self).reply(message, context, action, notice, recipient, line_limit)
