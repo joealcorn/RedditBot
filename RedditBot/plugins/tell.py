@@ -81,7 +81,7 @@ def tells(context):
         d_time = datetime.fromtimestamp(time)
         reply.append('{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
 
-    p = paste('\n'.join(reply), 'Notes for {}'.format(nick))
+    p = paste('\n'.join(reply), 'Notes for {}'.format(nick), unlisted=1)
     if p['success'] == False:
         bot.reply('Could not paste notes', context.line, False, True, context.line['user'])
         return
