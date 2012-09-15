@@ -7,6 +7,7 @@ status_url = 'https://api.twitter.com/1/statuses/show/{}.json'
 latest_url = 'http://api.twitter.com/1/statuses/user_timeline.json'
 line = u'@{screen_name}: {tweet}'
 
+blacklist = ['bigoletitties']
 
 @bot.regex(tweet_re)
 def announce_tweet(context):
@@ -19,6 +20,8 @@ def announce_tweet(context):
 
     info = {'screen_name': response.json['user']['screen_name'],
             'tweet': response.json['text']}
+    if info['screen_name'].lower() in blacklist:
+        return
     return utils.unescape_html(line.format(**info))
 
 
@@ -38,4 +41,6 @@ def twitter(context):
 
     info = {'screen_name': response.json[0]['user']['screen_name'],
             'tweet': response.json[0]['text']}
+    if info['screen_name'].lower() in blacklist:
+        return 'No'
     return utils.unescape_html(line.format(**info))
