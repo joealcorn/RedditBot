@@ -7,6 +7,7 @@ search_url = 'http://ajax.googleapis.com/ajax/services/search/web'
 @bot.command('g')  # also bind this function to '.g'
 @bot.command  # register the wrapped function as a plugin
 def google(context):
+    '''.g <query>'''
     # notice that we provide one arg, context: this is optional but if you
     # want access to the IRC line that triggered the plugin you need to
     # pass in some variable; we'll use context for this
