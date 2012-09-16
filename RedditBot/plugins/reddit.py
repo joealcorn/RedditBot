@@ -3,7 +3,7 @@ from RedditBot import bot, utils
 import re
 
 reddit_link = re.compile('http://(?:www\.)?redd(?:\.it/|it\.com/(?:tb|(?:r/[\w\.]+/)?comments)/)(\w+)(/.+/)?(\w{7})?')
-blacklist = ['spacedicks', 'clopclop', 'spaceclop']
+blacklist = ['spacedicks', 'clopclop', 'spaceclop', 'dolan']
 
 
 @bot.command
