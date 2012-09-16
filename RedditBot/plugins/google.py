@@ -17,4 +17,4 @@ def google(context):
     title = utils.unescape_html(first_result['titleNoFormatting'])
     ret = title + ' - ' + first_result['unescapedUrl']
 
-    return u'{0}: {1}'.format(context.line['user'], ret)
+    return '{0}: {1}'.format(context.line['user'], ret)
