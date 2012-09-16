@@ -5,10 +5,11 @@ class Config(object):
     TIMEOUT = 300
     NICK = 'RedditBot'
     REALNAME = 'https://github.com/buttscicles/RedditBot'
-    # CHANNELS = ['#alcojewtesting 1089']
-    CHANNELS = ['#alcotesting']
+    CHANNELS = ['#RedditMC']
 
     ADMINS = ['*!*@AlcoJew.staff.reddit-minecraft',
               '*!joe@buttscicl.es',
               '*!edk141@edk141.co.uk',
               '*!*@edk141.staff.reddit-minecraft']
+
+    LASTFM_API_KEY = ''
