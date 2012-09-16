@@ -2,14 +2,13 @@
 from RedditBot import bot, utils
 from RedditBot.ircglob import glob
 
-from itertools import groupby, ifilter, ifilterfalse, imap
+from itertools import groupby, ifilter, ifilterfalse
 
-import __builtin__
-import sys
 import threading
 import os.path
 
 save_ignores_lock = threading.Lock()
+
 
 def save_ignores():
     print 'Saving the ignore list...'
@@ -20,6 +19,7 @@ def save_ignores():
 if os.path.exists('bot_ignore.txt'):
     with open('bot_ignore.txt', 'r') as f:
         bot.config['IGNORE'] = utils.stripnewlines(f.readlines())
+
 
 @bot.command('.')
 @bot.command('help')
@@ -42,17 +42,16 @@ def usage(context):
             if len(grouped) > 1:
                 # shortcuts/secondary
                 for i, hook in enumerate(grouped[1:]):
-                    grouped[i+1] = '[' + grouped[i+1] + ']'
+                    grouped[i + 1] = '[' + grouped[i + 1] + ']'
             result.append(' '.join(grouped))
         result.sort()
         p = ', '.join(result)
         return 'Plugins currently loaded: ' + p
 
+
 @bot.command
 def raw(context):
     '''.raw <command>'''
-    #if not context.line['prefix'] in bot.config.get('ADMINS', []):
-    #    return
     if not utils.isadmin(context.line['prefix'], bot):
         return
     if context.args:
@@ -61,6 +60,7 @@ def raw(context):
         bot.irc.send_command(command, args)
     else:
         return raw.__doc__
+
 
 @bot.command
 def ignore(context):
@@ -73,21 +73,22 @@ def ignore(context):
         supersets = list(ifilter(lambda ignored: to_ignore.issub(glob(ignored)), bot.config['IGNORE']))
         if len(supersets) > 0:
             return 'Not ignoring \x02%s\x02 because it is already matched by \x02%s\x02' % (context.args, supersets[0])
-        
+
         filter = lambda ignored: to_ignore.issuper(glob(ignored))
         removed = list(ifilter(filter, bot.config['IGNORE']))
-        
+
         bot.config['IGNORE'] = list(ifilterfalse(filter, bot.config['IGNORE']))
         bot.config['IGNORE'].append(context.args)
-        
+
         save_ignores()
-        
+
         if len(removed) > 0:
             return 'Ignored and removed \x02%d\x02 redundant ignores: \x02%s\x02' % (len(removed), '\x02, \x02'.join(removed))
         else:
             return 'Ignored.'
     else:
         return eval.__doc__
+
 
 @bot.command
 def unignore(context):
@@ -97,19 +98,20 @@ def unignore(context):
         return
     if context.args:
         to_unignore = glob(context.args)
-        
+
         filter = lambda ignored: to_unignore.issuper(glob(ignored))
         subsets = list(ifilter(filter, bot.config['IGNORE']))
         if len(subsets) == 0:
             return 'Nothing to unignore.'
-        
+
         bot.config['IGNORE'] = list(ifilterfalse(filter, bot.config['IGNORE']))
-        
+
         save_ignores()
-        
+
         return 'Removed \x02%d\x02 ignores: \x02%s\x02' % (len(subsets), '\x02, \x02'.join(subsets))
     else:
         return eval.__doc__
+
 
 @bot.command
 def listignores(context):
@@ -118,8 +120,8 @@ def listignores(context):
         return
     word_list = bot.config.setdefault('IGNORE', [])
     if len(word_list) == 0:
-        bot.reply('Nothing to list.', context.line, False, True, context.line['user'], nofilter = True)
+        bot.reply('Nothing to list.', context.line, False, True, context.line['user'], nofilter=True)
     next, word_list = word_list[:4], word_list[4:]
     while next:
-        bot.reply('\x02%s\x02' % '\x02, \x02'.join(next), context.line, False, True, context.line['user'], nofilter = True)
+        bot.reply('\x02%s\x02' % '\x02, \x02'.join(next), context.line, False, True, context.line['user'], nofilter=True)
         next, word_list = word_list[:4], word_list[4:]
