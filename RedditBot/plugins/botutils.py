@@ -23,7 +23,6 @@ if os.path.exists('bot_ignore.txt'):
         bot.config['IGNORE'] = utils.stripnewlines(f.readlines())
 
 
-@bot.command('.')
 @bot.command('help')
 @bot.command
 def usage(context):
