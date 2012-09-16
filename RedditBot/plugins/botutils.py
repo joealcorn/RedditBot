@@ -3,6 +3,8 @@ from RedditBot import bot, utils
 from RedditBot.ircglob import glob
 
 from itertools import groupby, ifilter, ifilterfalse
+from datetime import timedelta
+from time import time
 
 import threading
 import os.path
@@ -125,3 +127,24 @@ def listignores(context):
     while next:
         bot.reply('\x02%s\x02' % '\x02, \x02'.join(next), context.line, False, True, context.line['user'], nofilter=True)
         next, word_list = word_list[:4], word_list[4:]
+
+
+@bot.command
+def uptime(context):
+    '''Usage: .uptime'''
+    if not utils.isadmin(context.line['prefix'], bot):
+        return
+    line = ''
+    try:
+        with open('/proc/uptime') as h:
+            uptime_secs = h.read()
+    except IOError:
+        # OS without /proc/uptime
+        pass
+    else:
+        uptime = timedelta(seconds=int(uptime_secs.split('.')[0]))
+        line = 'Server uptime: {} '.format(uptime) + line
+
+    uptime = timedelta(seconds=int(time() - bot.config['START_TIME']))
+
+    return line + '| Bot Uptime: {}'.format(uptime)
