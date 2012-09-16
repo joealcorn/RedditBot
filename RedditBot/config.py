@@ -5,7 +5,8 @@ class Config(object):
     TIMEOUT = 300
     NICK = 'RedditBot'
     REALNAME = 'https://github.com/buttscicles/RedditBot'
-    CHANNELS = ['#RedditMC']
+    # CHANNELS = ['#alcojewtesting 1089']
+    CHANNELS = ['#alcotesting']
 
     ADMINS = ['*!*@AlcoJew.staff.reddit-minecraft',
               '*!joe@buttscicl.es',
