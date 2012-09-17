@@ -3,7 +3,7 @@ from RedditBot import bot
 
 import threading
 
-def delayed_join(channel, delay = 10):
+def delayed_join(channel, delay=10):
     def join():
         bot.irc.send_command('JOIN', channel)
     threading.Timer(delay, join).start()
