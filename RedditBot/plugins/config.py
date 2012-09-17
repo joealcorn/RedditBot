@@ -1,6 +1,7 @@
 
 from RedditBot import bot, utils
 
+import os.path
 import copy
 import yaml
 
@@ -14,12 +15,13 @@ def save_config():
             (not key in bot.h_config or bot.h_config[key] != value))))
 
 def load_config():
-    with open('bot_config.yml', 'r') as f:
-        for key, value in yaml.load(f.read()).iteritems():
-            if not key in bot.config:
-                bot.config[key] = value
-            elif isinstance(bot.config[key], list):
-                bot.config[key] = list(set(bot.config[key] + value))
+    if os.path.exists('bot_config.yml'):
+        with open('bot_config.yml', 'r') as f:
+            for key, value in yaml.load(f.read()).iteritems():
+                if not key in bot.config:
+                    bot.config[key] = value
+                elif isinstance(bot.config[key], list):
+                    bot.config[key] = list(set(bot.config[key] + value))
 
 load_config()
 
