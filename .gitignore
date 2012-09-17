@@ -1,5 +1,6 @@
 
 bot_*.txt
+bot_*.yml
 *.db
 
 *.py[co]
