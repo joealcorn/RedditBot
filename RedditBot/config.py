@@ -11,5 +11,8 @@ class Config(object):
               '*!joe@buttscicl.es',
               '*!edk141@edk141.co.uk',
               '*!*@edk141.staff.reddit-minecraft']
+    
+    REDDIT_BLACKLIST = []
+    TWITTER_BLACKLIST = []
 
     LASTFM_API_KEY = ''

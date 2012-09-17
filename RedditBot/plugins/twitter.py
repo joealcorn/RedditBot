@@ -7,8 +7,6 @@ status_url = 'https://api.twitter.com/1/statuses/show/{}.json'
 latest_url = 'http://api.twitter.com/1/statuses/user_timeline.json'
 line = u'@{screen_name}: {tweet}'
 
-blacklist = ['bigoletitties']
-
 @bot.regex(tweet_re)
 def announce_tweet(context):
     ''' Announces tweets as they are posted in the channel '''
@@ -20,7 +18,7 @@ def announce_tweet(context):
 
     info = {'screen_name': response.json['user']['screen_name'],
             'tweet': response.json['text']}
-    if info['screen_name'].lower() in blacklist:
+    if info['screen_name'].lower() in bot.config['TWITTER_BLACKLIST']:
         return
     return utils.unescape_html(line.format(**info))
 
@@ -31,8 +29,8 @@ def twitter(context):
     username = context.args.strip().split(' ')[0]
     if username is '':
         return 'Usage: .twitter <username>'
-    elif username.lower().lstrip('@') in blacklist:
-        return 'No'
+    elif username.lower().lstrip('@') in bot.config['TWITTER_BLACKLIST']:
+        return 'No.'
 
     params = {'screen_name': username, 'count': 1}
     response = utils.make_request(latest_url, params)
