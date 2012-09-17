@@ -147,3 +147,13 @@ def uptime(context):
     uptime = timedelta(seconds=int(time() - bot.config['START_TIME']))
 
     return line + '| Bot Uptime: {}'.format(uptime)
+
+@bot.event('INVITE')
+def invite(context):
+    if utils.isadmin(context.line['prefix'], bot):
+        bot.irc.send_command('JOIN', context.line['args'][-1])
+    else:
+        for channel in bot.config['CHANNELS']:
+            if channel.lower().split(' ')[0] == context.line['args'][-1].lower():
+                bot.irc.send_command('JOIN', channel)
+                return
