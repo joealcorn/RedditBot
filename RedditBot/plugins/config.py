@@ -25,14 +25,14 @@ load_config()
 
 @bot.command
 def config(context):
-    '''.config (view|add|remove|revert) <key> [value]'''
+    '''.config (view|set|add|remove|revert) <key> [value]'''
     if not utils.isadmin(context.line['prefix'], bot):
         return
     cmd, key = str(context.args).split(' ', 1)
     if len(key.split(' ', 1)) > 1:
         key, arg = key.split(' ', 1)
     cmd = cmd.lower()
-    if not (cmd in ['add', 'remove', 'view', 'revert']):
+    if not (cmd in ['set', 'add', 'remove', 'view', 'revert']):
         return
     if key.upper() in blacklist:
         return
@@ -52,6 +52,9 @@ def config(context):
         else:
             bot.reply('Nothing to do.', context.line, False, True, context.line['user'], nofilter = True)
         return
+    if cmd == 'set' and (not key in bot.config or isinstance(bot.config[key], str)):
+        bot.config[key] = arg
+        return 'Set.'
     if key in bot.config and not isinstance(bot.config[key], list):
         return
     if not key in bot.config:
