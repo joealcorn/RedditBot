@@ -5,13 +5,12 @@ import os.path
 import copy
 import yaml
 
-blacklist = ['REGEX', 'IGNORE', 'EVENTS', 'CHANNELS', 'PLUGINS']
+blacklist = ['REGEX', 'IGNORE', 'EVENTS', 'CHANNELS', 'PLUGINS', 'START_TIME']
 
 def save_config():
     with open('bot_config.yml', 'w') as f:
         f.write(yaml.dump(dict((key, value) for key, value in bot.config.iteritems() if
             not (key.upper() in blacklist) and
-            isinstance(value, list) and
             (not key in bot.h_config or bot.h_config[key] != value))))
 
 def load_config():
@@ -56,6 +55,7 @@ def config(context):
         return
     if cmd == 'set' and (not key in bot.config or isinstance(bot.config[key], str)):
         bot.config[key] = arg
+        save_config()
         return 'Set.'
     if key in bot.config and not isinstance(bot.config[key], list):
         return
