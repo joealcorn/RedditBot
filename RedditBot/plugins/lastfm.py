@@ -25,12 +25,14 @@ def last_played(user):
     }
     r = utils.make_request(url, params=params)
     if isinstance(r, str):
-        # An error occured
         return r
+    elif 'error' in r.json:
+        return r.json['message']
+
     r = r.json['recenttracks']
 
     info = {
-        'artist': r['track'][0]['artist']['name'],
+        'artist': r['track'][0]['artist']['#text'],
         'user': r['@attr']['user'],
         'song': r['track'][0]['name'],
         'album': r['track'][0]['album']['#text']
@@ -52,8 +54,9 @@ def compare(user1, user2):
     }
     r = utils.make_request(url, params=params)
     if isinstance(r, str):
-        # An error occured
         return r
+    elif 'error' in r.json:
+        return r.json['message']
 
     r = r.json['comparison']
     info = {
@@ -61,7 +64,7 @@ def compare(user1, user2):
         'user2': r['input']['user'][1]['name'],
         'percent': float(r['result']['score']),
     }
-    
+
     line = u'{user1} vs {user2}: {percent:.0%} similarity'
 
     if r['result']['artists'].has_key('artist'):
