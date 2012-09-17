@@ -9,9 +9,9 @@ import re
 statuses = {'green': 'Up!', 'red': 'Down'}
 
 nerd_nu = [
- ('c.nerd.nu', 25565, 'players', ['creative', 'c']),
- ('p.nerd.nu', 25565, 'carebears', ['pve', 'p']),
- ('s.nerd.nu', 25565, 'players', ['survival', 's'])
+ ('c.nerd.nu', 25565, ['creative', 'c']),
+ ('p.nerd.nu', 25565, ['pve', 'p']),
+ ('s.nerd.nu', 25565, ['survival', 's'])
 ]
 
 isup_re = re.compile(r'is (\w+) (?:up|down)', re.I)
@@ -51,9 +51,13 @@ def get_info(host, port):
 def find_server(name):
     name = name.lower()
     for server in nerd_nu:
-        if name == server[0] or name in server[3]:
+        if name == server[0] or name in server[2]:
             return server
     return None
+
+def silly_label(server):
+    n = 'PLAYERS_{}'.format(server[0])
+    return bot.config.get(n, 'players')
 
 @bot.command('login')
 @bot.command('session')
@@ -83,7 +87,7 @@ def is_x_up(context):
         return
     info = get_info(server[0], server[1])
     if info:
-        return '{0} is online with {players}/{max_players} {1} online.'.format(server[0], server[2], **info)
+        return '{0} is online with {players}/{max_players} {1} online.'.format(server[0], silly_label(server), **info)
     else:
         return '{0} seems to be down :(.'.format(server[0])
 
@@ -99,6 +103,6 @@ def isup(context):
         server = (match.group(1), match.group(2) or 25565, 'players')
     info = get_info(server[0], server[1])
     if info:
-        return '{0} is online with {players}/{max_players} {1} online.'.format(server[0], server[2], **info)
+        return '{0} is online with {players}/{max_players} {1} online.'.format(server[0], silly_label(server), **info)
     else:
         return '{0} seems to be down :(.'.format(server[0])
