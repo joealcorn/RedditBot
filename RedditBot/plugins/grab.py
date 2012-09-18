@@ -31,14 +31,14 @@ def grab(context):
     '''.grab <start_text> [~~ <end_text>]'''
     if not context.line['sender'].startswith('#'):
         return
-    if not context.line['sender'] in scrollback:
+    if not context.line['sender'].lower() in scrollback:
         return 'Nothing found.'
     r = []
     if '~~' in context.args:
         str1, str2 = map(unicode.strip, context.args.lower().split('~~', 1))
         matched = False
         s = []
-        for line in scrollback[context.line['sender']]:
+        for line in scrollback[context.line['sender'].lower()]:
             if str1 in line[1].lower():
                 matched = True
             if matched:
@@ -48,7 +48,7 @@ def grab(context):
                     s = []
     else:
         str1 = context.args.lower().strip()
-        for line in scrollback[context.line['sender']]:
+        for line in scrollback[context.line['sender'].lower()]:
             if str1 in line[1].lower():
                 r[:] = [line]
                 break
