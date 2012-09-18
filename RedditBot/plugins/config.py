@@ -26,15 +26,19 @@ load_config()
 
 @bot.command
 def config(context):
-    '''.config (view|set|add|remove|revert) <key> [value]'''
+    '''.config (list|view|set|add|remove|revert) <key> [value]'''
     if not utils.isadmin(context.line['prefix'], bot):
+        return
+    cmd, = str(context.args).split(' ', 1)
+    cmd = cmd.lower()
+    if not (cmd in ['list', 'set', 'add', 'remove', 'view', 'revert']):
+        return
+    if cmd == 'list':
+        bot.reply(repr(bot.config.keys()), context.line, False, True, context.line['user'], nofilter = True)
         return
     cmd, key = str(context.args).split(' ', 1)
     if len(key.split(' ', 1)) > 1:
         key, arg = key.split(' ', 1)
-    cmd = cmd.lower()
-    if not (cmd in ['set', 'add', 'remove', 'view', 'revert']):
-        return
     if key.upper() in blacklist:
         return
     if cmd == 'view':
