@@ -55,7 +55,7 @@ def grab(context):
     if r == []:
         return 'Nothing found.'
     match = map(format_line, r)
-    p = paste('\n'.join(match))
+    p = paste('\n'.join(match), title='Grabbed from {}'.format(context.line['sender']))
     if p['success']:
         return p['url']
     else:
