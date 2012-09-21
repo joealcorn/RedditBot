@@ -142,7 +142,7 @@ def uptime(context):
         pass
     else:
         uptime = timedelta(seconds=int(uptime_secs.split('.')[0]))
-        line = 'Server uptime: {}'.format(uptime) + line
+        line = 'Server uptime: {}'.format(uptime)
 
     uptime = timedelta(seconds=int(time() - bot.config['START_TIME']))
 
