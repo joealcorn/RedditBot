@@ -10,6 +10,7 @@ import time
 
 import sqlite3
 
+
 def get_db_connection(name=None):
     if name is None:
         name = '{0}.{1}.db'.format(bot.config['NICK'], bot.config['SERVER'])
@@ -27,14 +28,25 @@ def get_tells(db, user_to):
                       ' user_to=lower(?) order by time',
                       (user_to.lower(),)).fetchall()
 
+
+def get_users(db):
+    users = [user[0].lower() for user in db.execute('select distinct user_to from tell').fetchall()]
+    bot.config['TELL_USERS'] = users
+
+
 @bot.event('PRIVMSG')
 def tellinput(context):
     nick = context.line['user']
 
-    db = get_db_connection()
-    db_init(db)
+    if nick.lower() not in bot.config['TELL_USERS']:
+        return
 
-    tells = get_tells(db, nick)
+    db = get_db_connection()
+    try:
+        tells = get_tells(db, nick)
+    except db.OperationalError:
+        db_init(db)
+        tells = get_tells(db, nick)
 
     if len(tells) == 0:
         return
@@ -49,6 +61,7 @@ def tellinput(context):
         if p['success'] == True:
             db.execute('delete from tell where user_to=lower(?)', (nick,))
             db.commit()
+            get_users(db)
         else:
             return
 
@@ -56,7 +69,9 @@ def tellinput(context):
     else:
         db.execute('delete from tell where user_to=lower(?)', (nick,))
         db.commit()
+        get_users(db)
         return '\n'.join(imap(lambda x: '{0}: {1}'.format(nick, x), reply))
+
 
 @bot.command
 def tells(context):
@@ -66,15 +81,19 @@ def tells(context):
     nick = context.args
 
     db = get_db_connection()
-    db_init(db)
 
-    tells = get_tells(db, nick)
+    try:
+        tells = get_tells(db, nick)
+    except db.OperationalError:
+        db_init(db)
+        tells = get_tells(db, nick)
 
     if len(tells) == 0:
         return
 
     db.execute('delete from tell where user_to=lower(?)', (nick,))
     db.commit()
+    get_users(db)
 
     reply = []
     for user_from, message, time, chan in tells:
@@ -94,9 +113,6 @@ def tells(context):
 def tell(context):
     '''.tell <nick> <message>'''
 
-    db = get_db_connection()
-    db_init(db)
-
     query = context.args.split(' ', 1)
     nick = context.line['user']
     chan = context.line['sender']
@@ -114,18 +130,21 @@ def tell(context):
     if user_to == user_from.lower():
         return 'No.'
 
-    #if db.execute('select count() from tell where user_to=?',
-    #              (user_to,)).fetchone()[0] >= 5:
-    #    return 'That person has too many things queued.'
+    db = get_db_connection()
 
-    try:
-        db.execute('insert into tell(user_to, user_from, message, chan, '
-                   'time) values(?,?,?,?,?)', (user_to,
-                                               user_from,
-                                               message,
-                                               chan,
-                                               time.time()))
-        db.commit()
-    except db.IntegrityError:
-        return 'Message has already been queued.'
-    return '{0}: I\'ll tell {1} that when I see them.'.format(nick, query[0])
+    for i in range(2):
+        try:
+            db.execute('insert into tell(user_to, user_from, message, chan, '
+                       'time) values(?,?,?,?,?)', (user_to,
+                                                   user_from,
+                                                   message,
+                                                   chan,
+                                                   time.time()))
+            db.commit()
+            get_users(db)
+        except db.IntegrityError:
+            return 'Message has already been queued.'
+        except db.OperationalError:
+            db_init(db)
+        else:
+            return '{0}: I\'ll tell {1} that when I see them.'.format(nick, query[0])
