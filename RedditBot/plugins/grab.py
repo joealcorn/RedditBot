@@ -12,6 +12,8 @@ action_re = re.compile(r'^\x01ACTION (.*)\x01$', re.I)
 def add_to_scrollback(context):
     if not context.line['sender'].startswith('#'):
         return
+    if context.line['message'].lower().startswith(bot.config['CMD_PREFIX'] + 'grab'):
+        return
     if context.line['sender'].lower() not in scrollback:
         scrollback[context.line['sender'].lower()] = []
     s = scrollback[context.line['sender'].lower()]
@@ -46,6 +48,7 @@ def grab(context):
                 if str2 in line[1].lower():
                     r.extend(s)
                     s = []
+                    break # make matching non-greedy, unsure if this is good thing
     else:
         str1 = context.args.lower().strip()
         for line in scrollback[context.line['sender'].lower()]:
