@@ -31,14 +31,14 @@ def get_tells(db, user_to):
 
 def get_users(db):
     users = [user[0].lower() for user in db.execute('select distinct user_to from tell').fetchall()]
-    bot.config['TELL_USERS'] = users
+    bot.data['TELL_USERS'] = users
 
 
 @bot.event('PRIVMSG')
 def tellinput(context):
     nick = context.line['user']
 
-    if nick.lower() not in bot.config['TELL_USERS']:
+    if nick.lower() not in bot.data['TELL_USERS']:
         return
 
     db = get_db_connection()
