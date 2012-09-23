@@ -54,10 +54,10 @@ def tellinput(context):
     reply = []
     for user_from, message, time, chan in tells:
         d_time = datetime.fromtimestamp(time)
-        reply.append('{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
+        reply.append(u'{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
 
     if len(tells) > 2:
-        p = paste('\n'.join(reply), 'Notes for {}'.format(nick))
+        p = paste(u'\n'.join(reply), u'Notes for {}'.format(nick))
         if p['success'] == True:
             db.execute('delete from tell where user_to=lower(?)', (nick,))
             db.commit()
@@ -65,12 +65,12 @@ def tellinput(context):
         else:
             return
 
-        return '{0}: See {1} for your messages.'.format(nick, p['url'])
+        return u'{0}: See {1} for your messages.'.format(nick, p['url'])
     else:
         db.execute('delete from tell where user_to=lower(?)', (nick,))
         db.commit()
         get_users(db)
-        return '\n'.join(imap(lambda x: '{0}: {1}'.format(nick, x), reply))
+        return u'\n'.join(imap(lambda x: u'{0}: {1}'.format(nick, x), reply))
 
 
 @bot.command
@@ -98,11 +98,11 @@ def tells(context):
     reply = []
     for user_from, message, time, chan in tells:
         d_time = datetime.fromtimestamp(time)
-        reply.append('{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
+        reply.append(u'{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
 
-    p = paste('\n'.join(reply), 'Notes for {}'.format(nick), unlisted=1)
+    p = paste(u'\n'.join(reply), u'Notes for {}'.format(nick), unlisted=1)
     if p['success'] == False:
-        bot.reply('Could not paste notes: {}'.format(p['error']), context.line, False, True, context.line['user'])
+        bot.reply(u'Could not paste notes: {}'.format(p['error']), context.line, False, True, context.line['user'])
         return
     else:
         bot.reply(p['url'], context.line, False, True, context.line['user'])
@@ -147,4 +147,4 @@ def tell(context):
         except db.OperationalError:
             db_init(db)
         else:
-            return '{0}: I\'ll tell {1} that when I see them.'.format(nick, query[0])
+            return u'{0}: I\'ll tell {1} that when I see them.'.format(nick, query[0])
