@@ -7,6 +7,11 @@ import socket
 import re
 
 statuses = {'green': 'Up!', 'red': 'Down'}
+account  = {'true': '{} is a premium Minecaft account',
+            'false': '{} is \x02not\x02 a premium Minecraft account'}
+
+isup_re = re.compile(r'is (\w+) (?:up|down)', re.I)
+server_re = re.compile(r'^\s*([A-Za-z0-9_-]+\.[A-Za-z0-9_.-]+)(?::([0-9]{1,5}))?\s*$')
 
 nerd_nu = [
  ('c.nerd.nu', 25565, ['creative', 'c']),
@@ -14,9 +19,6 @@ nerd_nu = [
  ('s.nerd.nu', 25565, ['survival', 's'])
 ]
 
-isup_re = re.compile(r'is (\w+) (?:up|down)', re.I)
-
-server_re = re.compile(r'^\s*([A-Za-z0-9_-]+\.[A-Za-z0-9_.-]+)(?::([0-9]{1,5}))?\s*$')
 
 def get_info(host, port):
     try:
@@ -48,6 +50,7 @@ def get_info(host, port):
         print e
         return False
 
+
 def find_server(name):
     name = name.lower()
     for server in nerd_nu:
@@ -55,9 +58,11 @@ def find_server(name):
             return server
     return None
 
+
 def silly_label(server):
     n = 'PLAYERS_{}'.format(server[0])
     return bot.config.get(n, 'players')
+
 
 @bot.command('login')
 @bot.command('session')
@@ -71,6 +76,7 @@ def minecraft_status(context):
     line = '[Login] {login} [Session] {session}'.format(**response)
     return line
 
+
 @bot.command
 def status(context):
     '''Usage: .status'''
@@ -79,6 +85,7 @@ def status(context):
         '{motd}: [{players}/{max_players}]'.format(x['server'][0], **x['info'])
         if x['info'] else '{0}: down'.format(x['server'][0]), servers)
     return ' | '.join(servers)
+
 
 @bot.regex(isup_re)
 def is_x_up(context):
@@ -90,6 +97,7 @@ def is_x_up(context):
         return '{0} is online with {players}/{max_players} {1} online.'.format(server[0], silly_label(server), **info)
     else:
         return '{0} seems to be down :(.'.format(server[0])
+
 
 @bot.command
 def isup(context):
@@ -106,3 +114,19 @@ def isup(context):
         return '{0} is online with {players}/{max_players} {1} online.'.format(server[0], silly_label(server), **info)
     else:
         return '{0} seems to be down :(.'.format(server[0])
+
+
+@bot.command('mcaccount')
+@bot.command('mcpremium')
+def premium(context):
+    '''Usage: .mcaccount <username>'''
+    arg = context.args.split(' ')[0]
+    if len(arg) < 1:
+        return premium.__doc__
+    params = {'user': arg}
+    r = utils.make_request('http://minecraft.net/haspaid.jsp', params=params)
+
+    try:
+        return account.get(r.text, 'Unexpected Response').format(arg)
+    except AttributeError:
+        return r
