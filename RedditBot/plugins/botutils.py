@@ -64,6 +64,17 @@ def raw(context):
 
 
 @bot.command
+def inject(context):
+    '''.inject <input_data>'''
+    if not utils.isadmin(context.line['prefix'], bot):
+        return
+    if context.args:
+        bot.inject_input(context.args)
+    else:
+        return inject.__doc__
+
+
+@bot.command
 def ignore(context):
     '''.ignore nick!user@host'''
     bot.config.setdefault('IGNORE', [])
