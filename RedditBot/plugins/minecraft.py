@@ -1,6 +1,8 @@
 
 from RedditBot import bot, utils
 
+from RedditBot.plugins.mcbouncer import mcb_status
+
 #from itertools import imap
 
 import socket
@@ -122,7 +124,11 @@ def status(context):
         if not info:
             return '{} seems to be down'.format(host)
         return '{motd}: [{players}/{max_players}]'.format(**info)
+    def mcb_info():
+        up = mcb_status()['success']
+        return 'MCBouncer: {}'.format('Up!' if up else 'Down')
     servers = [server_info(s[0], s[1]) for s in nerd_nu]
+    servers.append(mcb_info())
     return ' | '.join(servers)
 
 
