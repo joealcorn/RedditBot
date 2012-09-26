@@ -128,7 +128,8 @@ def status(context):
         up = mcb_status()['success']
         return 'MCBouncer: {}'.format('Up!' if up else 'Down')
     servers = [server_info(s[0], s[1]) for s in nerd_nu]
-    servers.append(mcb_info())
+    if bot.config.get('MCBOUNCER_KEY', False):
+        servers.append(mcb_info())
     return ' | '.join(servers)
 
 
