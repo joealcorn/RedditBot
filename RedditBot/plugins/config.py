@@ -41,7 +41,7 @@ def config(context):
     if key.upper() in blacklist:
         return
     if cmd == 'view':
-        if key in bot.config and not key.upper().endswith('_PASSWORD'):
+        if key in bot.config and not key.upper().endswith('_PASSWORD') and not key.upper().endswith('_KEY'):
             bot.reply(repr(bot.config[key]), context.line, False, True, context.line['user'], nofilter = True)
         return
     elif cmd == 'revert':
