@@ -117,10 +117,12 @@ def minecraft_status(context):
 @bot.command
 def status(context):
     '''Usage: .status'''
-    servers = map(lambda x: {'info': get_info(x[0], x[1]), 'server': x}, nerd_nu)
-    servers = map(lambda x:
-        '{motd}: [{players}/{max_players}]'.format(x['server'][0], **x['info'])
-        if x['info'] else '{0}: down'.format(x['server'][0]), servers)
+    def server_info(host, port):
+        info = get_info(host, port)
+        if not info:
+            return '{} seems to be down'.format(host)
+        return '{motd}: [{players}/{max_players}]'.format(**info)
+    servers = [server_info(s[0], s[1]) for s in nerd_nu]
     return ' | '.join(servers)
 
 
