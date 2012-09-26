@@ -6,6 +6,8 @@ from RedditBot import bot, utils
 import socket
 import re
 
+from requests import codes
+
 statuses = {'green': 'Up!', 'red': 'Down'}
 account  = {'true': '{} is a premium Minecaft account',
             'false': '{} is \x02not\x02 a premium Minecraft account'}
@@ -64,15 +66,50 @@ def silly_label(server):
     return bot.config.get(n, 'players')
 
 
+def manual_login():
+    params = {'user': bot.config['MINECRAFT_USER'],
+              'password': bot.config['MINECRAFT_PASSWORD'],
+              'version': 9001}
+
+    r = utils.make_request('https://login.minecraft.net', params=params, method='POST')
+    if isinstance(r, str):
+        return 'Down ({})'.format(r)
+    else:
+        if r.status_code == codes.ok:
+            return 'Up!'
+        else:
+            return 'Down ({})'.format(r.status_code)
+
+
+def manual_session():
+    params = {'user': bot.config['MINECRAFT_USER'],
+              'sessionId': 'invalid',
+              'serverId': 'invalid'}
+
+    r = utils.make_request('http://session.minecraft.net/game/joinserver.jsp', params=params)
+    if isinstance(r, str):
+        return 'Down ({})'.format(r)
+    else:
+        if r.status_code == codes.ok:
+            return 'Up!'
+        else:
+            return 'Down ({})'.format(r.status_code)
+
+
 @bot.command('login')
 @bot.command('session')
 def minecraft_status(context):
     '''Usage: .session'''
     r = utils.make_request('http://status.mojang.com/check')
     response = {}
-    for i in r.json:
-        for k, v in i.iteritems():
-            response[k.split('.')[0]] = statuses[v]
+    try:
+        for i in r.json:
+            for k, v in i.iteritems():
+                response[k.split('.')[0]] = statuses[v]
+    except:
+        response['session'] = manual_session()
+        response['login'] = manual_login()
+
     line = '[Login] {login} [Session] {session}'.format(**response)
     return line
 

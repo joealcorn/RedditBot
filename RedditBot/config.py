@@ -17,3 +17,6 @@ class Config(object):
     TWITTER_BLACKLIST = []
 
     LASTFM_API_KEY = ''
+
+    MINECRAFT_USER = ''
+    MINECRAFT_PASSWORD = ''
