@@ -39,3 +39,6 @@ class Bot(irctk.bot.Bot):
         for message in message.split('\n'):
             message = message.rstrip('\r')
             super(Bot, self).reply(message, context, action, notice, recipient, line_limit)
+    
+    def inject_input(self, line):
+        self.irc.connection.inp.put(line + '\r\n')
