@@ -74,18 +74,19 @@ class Bot(irctk.bot.Bot):
                     
                     # process for a message
                     if message.startswith(prefix):
-                        command = message[1:].split(' ')[0].lower()
+                        cmd = message[1:].split(' ')[0].lower()
                         match, exact, allmatches = False, False, []
                         for plugin in self.config['PLUGINS']:
                             plugin['context'] = dict(self.irc.context)
                             hook = plugin['hook'].lower()
-                            if hook.startswith(command):
+                            if hook.startswith(cmd):
                                 match = plugin
                                 allmatches.append(plugin['hook'])
-                                if hook == command:
+                                if hook == cmd:
                                     exact = plugin
                         if len(allmatches) > 1 and not exact:
-                            self.reply('Not specific enough, did you mean: {}'.format(', '.join(allmatches)), self.irc.context)
+                            if len(allmatches) < 4 and len(cmd) > 1:
+                                self.reply('Not specific enough, did you mean: \x02{}\x02'.format('\x02, \x02'.join(allmatches)), self.irc.context)
                         else:
                             match = exact or match
                             if match:
