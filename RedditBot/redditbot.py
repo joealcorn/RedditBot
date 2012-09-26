@@ -6,6 +6,9 @@
 import irctk.bot
 import irctk.plugins
 
+import time
+import re
+
 from RedditBot.ircglob import glob
 from RedditBot.utils import isignored, isadmin
 
@@ -42,3 +45,59 @@ class Bot(irctk.bot.Bot):
     
     def inject_input(self, line):
         self.irc.connection.inp.put(line + '\r\n')
+    
+    def _parse_input(self, wait=0.01):
+        while True:
+            time.sleep(wait)
+            with self.irc.lock:
+                prefix = self.config['CMD_PREFIX']
+                
+                args = self.irc.context.get('args')
+                command = self.irc.context.get('command')
+                message = self.irc.context.get('message')
+                raw = self.irc.context.get('raw')
+                
+                while not self.context_stale and args:
+                    
+                    # process regex
+                    for regex in self.config['REGEX']:
+                        hook = regex['hook']
+                        search = re.search(hook, raw)
+                        if not search:
+                            continue
+                        regex['context'] = dict(self.irc.context)
+                        regex['context']['regex_search'] = search
+                        self.plugin.enqueue_plugin(regex,
+                                                   hook,
+                                                   raw,
+                                                   regex=True)
+                    
+                    # process for a message
+                    if message.startswith(prefix):
+                        command = message[1:].split(' ')[0].lower()
+                        match, exact, allmatches = False, False, []
+                        for plugin in self.config['PLUGINS']:
+                            plugin['context'] = dict(self.irc.context)
+                            hook = plugin['hook'].lower()
+                            if hook.startswith(command):
+                                match = plugin
+                                allmatches.append(plugin['hook'])
+                                if hook == command:
+                                    exact = plugin
+                        if len(allmatches) > 1 and not exact:
+                            self.reply('Not specific enough, did you mean: {}'.format(', '.join(allmatches)), self.irc.context)
+                        else:
+                            match = exact or match
+                            if match:
+                                hook = message.split(' ')[0]
+                                self.plugin.enqueue_plugin(match, hook, message)
+                    
+                    # process for a command
+                    if command and command.isupper():
+                        for event in self.config['EVENTS']:
+                            event['context'] = dict(self.irc.context)
+                            hook = event['hook']
+                            self.plugin.enqueue_plugin(event, hook, command)
+                    
+                    # irc context consumed; mark it as such
+                    self.irc.context['stale'] = True
