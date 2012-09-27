@@ -31,12 +31,14 @@ class Bot(irctk.bot.Bot):
         self.reply_hook = hook
     
     def reply(self, message, context, action=False, notice=False,
-            recipient=None, line_limit=400, **kwargs):
+            recipient=None, line_limit=400, max_lines=3, **kwargs):
         # deal with reply hook for badwords
         if not kwargs.get('nofilter', False) and self.reply_hook:
             message = self.reply_hook(message)
         if not message:
             return
+        
+        message = message[:max_lines * line_limit]
         
         # split into lines
         for message in message.split('\n'):
