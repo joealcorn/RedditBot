@@ -10,6 +10,7 @@ import time
 
 import sqlite3
 
+
 def get_db_connection(name=None):
     if name is None:
         name = '{0}.{1}.db'.format(bot.config['NICK'], bot.config['SERVER'])
@@ -27,14 +28,25 @@ def get_tells(db, user_to):
                       ' user_to=lower(?) order by time',
                       (user_to.lower(),)).fetchall()
 
+
+def get_users(db):
+    users = [user[0].lower() for user in db.execute('select distinct user_to from tell').fetchall()]
+    bot.data['TELL_USERS'] = users
+
+
 @bot.event('PRIVMSG')
 def tellinput(context):
     nick = context.line['user']
 
-    db = get_db_connection()
-    db_init(db)
+    if nick.lower() not in bot.data['TELL_USERS']:
+        return
 
-    tells = get_tells(db, nick)
+    db = get_db_connection()
+    try:
+        tells = get_tells(db, nick)
+    except db.OperationalError:
+        db_init(db)
+        tells = get_tells(db, nick)
 
     if len(tells) == 0:
         return
@@ -42,21 +54,24 @@ def tellinput(context):
     reply = []
     for user_from, message, time, chan in tells:
         d_time = datetime.fromtimestamp(time)
-        reply.append('{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
+        reply.append(u'{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
 
     if len(tells) > 2:
-        p = paste('\n'.join(reply), 'Notes for {}'.format(nick))
+        p = paste(u'\n'.join(reply), u'Notes for {}'.format(nick))
         if p['success'] == True:
             db.execute('delete from tell where user_to=lower(?)', (nick,))
             db.commit()
+            get_users(db)
         else:
             return
 
-        return '{0}: See {1} for your messages.'.format(nick, p['url'])
+        return u'{0}: See {1} for your messages.'.format(nick, p['url'])
     else:
         db.execute('delete from tell where user_to=lower(?)', (nick,))
         db.commit()
-        return '\n'.join(imap(lambda x: '{0}: {1}'.format(nick, x), reply))
+        get_users(db)
+        return u'\n'.join(imap(lambda x: u'{0}: {1}'.format(nick, x), reply))
+
 
 @bot.command
 def tells(context):
@@ -66,24 +81,28 @@ def tells(context):
     nick = context.args
 
     db = get_db_connection()
-    db_init(db)
 
-    tells = get_tells(db, nick)
+    try:
+        tells = get_tells(db, nick)
+    except db.OperationalError:
+        db_init(db)
+        tells = get_tells(db, nick)
 
     if len(tells) == 0:
         return
 
     db.execute('delete from tell where user_to=lower(?)', (nick,))
     db.commit()
+    get_users(db)
 
     reply = []
     for user_from, message, time, chan in tells:
         d_time = datetime.fromtimestamp(time)
-        reply.append('{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
+        reply.append(u'{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
 
-    p = paste('\n'.join(reply), 'Notes for {}'.format(nick), unlisted=1)
+    p = paste(u'\n'.join(reply), u'Notes for {}'.format(nick), unlisted=1)
     if p['success'] == False:
-        bot.reply('Could not paste notes: {}'.format(p['error']), context.line, False, True, context.line['user'])
+        bot.reply(u'Could not paste notes: {}'.format(p['error']), context.line, False, True, context.line['user'])
         return
     else:
         bot.reply(p['url'], context.line, False, True, context.line['user'])
@@ -93,9 +112,6 @@ def tells(context):
 @bot.command
 def tell(context):
     '''.tell <nick> <message>'''
-
-    db = get_db_connection()
-    db_init(db)
 
     query = context.args.split(' ', 1)
     nick = context.line['user']
@@ -114,18 +130,21 @@ def tell(context):
     if user_to == user_from.lower():
         return 'No.'
 
-    #if db.execute('select count() from tell where user_to=?',
-    #              (user_to,)).fetchone()[0] >= 5:
-    #    return 'That person has too many things queued.'
+    db = get_db_connection()
 
-    try:
-        db.execute('insert into tell(user_to, user_from, message, chan, '
-                   'time) values(?,?,?,?,?)', (user_to,
-                                               user_from,
-                                               message,
-                                               chan,
-                                               time.time()))
-        db.commit()
-    except db.IntegrityError:
-        return 'Message has already been queued.'
-    return '{0}: I\'ll tell {1} that when I see them.'.format(nick, query[0])
+    for i in range(2):
+        try:
+            db.execute('insert into tell(user_to, user_from, message, chan, '
+                       'time) values(?,?,?,?,?)', (user_to,
+                                                   user_from,
+                                                   message,
+                                                   chan,
+                                                   time.time()))
+            db.commit()
+            get_users(db)
+        except db.IntegrityError:
+            return 'Message has already been queued.'
+        except db.OperationalError:
+            db_init(db)
+        else:
+            return u'{0}: I\'ll tell {1} that when I see them.'.format(nick, query[0])
