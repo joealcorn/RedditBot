@@ -1,5 +1,6 @@
 
 from RedditBot import bot
+from RedditBot.pastebin import paste
 
 import requests
 
@@ -21,7 +22,14 @@ def python(context):
     
     if not data:
         return 'Empty result'
-
-    if data.startswith('Traceback (most recent call last):'):
-        data = data.splitlines()[-1]
-    return data
+        
+    lines = data.splitlines()
+    
+    if len(lines) > 1:
+        p = paste(data, title='Executed by {}'.format(context.line['user']))
+        if p['success']:
+            return '{0}: {1}'.format(context.line['user'], p['url'])
+        else:
+            return lines[-1]
+    
+    return lines[0]
