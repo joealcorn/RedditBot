@@ -50,7 +50,7 @@ def gitio_shorten(url):
 
 
 def is_error(json):
-    return (len(json.keys()) == 1 and 'message' in json.keys())
+    return type(json) is dict and (len(json.keys()) == 1 and 'message' in json)
 
 
 def api_format_commit(info, verbose=False):
@@ -136,6 +136,7 @@ def get_gist(context):
 
 @bot.regex(repo_re)
 def announce_repo(context):
+    if commit_re.match(context.line['message']): return
     return api_format_repo(context.line['regex_search'].groupdict()) or None
 
 
