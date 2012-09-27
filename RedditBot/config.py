@@ -19,6 +19,7 @@ class Config(object):
 
     LASTFM_API_KEY = ''
     MCBOUNCER_KEY = ''
+    WOLFRAMALPHA_KEY = ''
 
     MINECRAFT_USER = ''
     MINECRAFT_PASSWORD = ''
