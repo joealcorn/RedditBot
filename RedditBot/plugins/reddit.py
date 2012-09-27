@@ -20,13 +20,13 @@ def reddit(context):
 
     url = 'http://www.reddit.com/r/{}.json'.format(subreddit)
     submission = utils.make_request(url, params)
-    if isinstance(submission.json, dict):
+    if isinstance(submission, str):
+        return submission
+    else:
         try:
             submission = submission.json['data']['children'][0]['data']
         except:
             return 'Could not fetch json, does that subreddit exist?'
-    else:
-        return submission
 
     info = {
         'username': context.line['user'],
@@ -49,13 +49,13 @@ def karma(context):
 
     url = 'http://www.reddit.com/user/{}/about.json'.format(redditor)
     redditor = utils.make_request(url)
-    if isinstance(redditor.json, dict):
+    if isinstance(redditor, str):
+        return redditor
+    else:
         try:
             redditor = redditor.json['data']
         except:
             return 'Could not fetch json, does that user exist?'
-    else:
-        return redditor
 
     info = {
         'redditor': redditor['name'],
@@ -71,13 +71,13 @@ def announce_reddit(context):
     submission_id = context.line['regex_search'].group(1)
     url = 'http://www.reddit.com/comments/{}.json'.format(submission_id)
     submission = utils.make_request(url)
-    if isinstance(submission.json, list):
+    if isinstance(submission, str):
+        return submission
+    else:
         try:
             submission = submission.json[0]['data']['children'][0]['data']
         except Exception:
             return 'Could not fetch json'
-    else:
-        return submission
 
     info = {
         'title': submission['title'],
