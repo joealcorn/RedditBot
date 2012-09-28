@@ -1,6 +1,7 @@
 from RedditBot import bot, utils
 
 import re
+import requests
 
 reddit_link = re.compile('http://(?:www\.)?redd(?:\.it/|it\.com/(?:tb|(?:r/[\w\.]+/)?comments)/)(\w+)(/.+/)?(\w{7})?')
 
@@ -92,3 +93,21 @@ def announce_reddit(context):
     else:
         # Link to submission
         return line
+
+
+@bot.command('source')
+def reddit_source(context):
+    urls = [context.args]
+    imgur = re.match(r'\bhttp://i\.imgur\.com/(?P<hash>\w+)\.\b', context.args)
+    if imgur:
+        print 'imgur link: {hash}'.format(**imgur.groupdict())
+        urls.append('http://imgur.com/{hash}'.format(**imgur.groupdict()))
+    posts = []
+    for u in urls:
+        r = requests.get('http://www.reddit.com/api/info.json', params={'url': u})
+        posts.extend(r.json['data']['children'])
+    print repr(posts)
+    if not posts:
+        return
+    posts.sort(key=lambda x: x['data']['created'])
+    return '/r/{subreddit} -- http://redd.it/{id}'.format(**posts[0]['data'])
