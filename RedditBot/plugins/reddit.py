@@ -31,7 +31,7 @@ def reddit(context):
     info = {
         'username': context.line['user'],
         'subreddit': submission['subreddit'],
-        'title': submission['title'],
+        'title': utils.unescape_html(submission['title']),
         'up': submission['ups'],
         'down': submission['downs'],
         'shortlink': 'http://redd.it/' + submission['id']
@@ -80,7 +80,7 @@ def announce_reddit(context):
             return 'Could not fetch json'
 
     info = {
-        'title': submission['title'],
+        'title': utils.unescape_html(submission['title']),
         'up': submission['ups'],
         'down': submission['downs'],
         'shortlink': 'http://redd.it/' + submission['id']
