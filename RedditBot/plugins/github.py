@@ -8,7 +8,7 @@ import sys
 
 api_url = 'https://api.github.com/{0}'
 
-commit_re = re.compile(r'\bhttps?://github.com/(?P<owner>\w+)/(?P<repo>\w+)/commit/(?P<hash>[A-Fa-f0-9]+)\b', re.I)
+commit_re = re.compile(r'\bhttps?://github.com/(?P<owner>\w+)/(?P<repo>\w+)/commit/(?P<hash>[A-Fa-f0-9]+)/?(?![/\w])', re.I)
 commit_request = 'repos/{owner}/{repo}/git/commits/{hash}'
 commit_web = 'https://github.com/{owner}/{repo}/commit/{hash}'
 commit_format = '\x02{short_url}\x02 -- {sha:.7} {author[name]} <{author[email]}>: {message}'
@@ -20,7 +20,7 @@ gist_re = re.compile(r'\bhttps?://gist.github.com/(?P<id>[A-Fa-f0-9]+)\b')
 gist_request = 'gists/{id}'
 gist_format = '\x02{short_url}\x02 -- uploaded by {user[login]}, files: {file_list}, {comments} comments'
 
-repo_re = re.compile(r'\bhttps?://github.com/(?P<owner>\w+)/(?P<repo>\w+)/?\b', re.I)
+repo_re = re.compile(r'\bhttps?://github.com/(?P<owner>\w+)/(?P<repo>\w+)/?(?![/\w])', re.I)
 repo_request = 'repos/{owner}/{repo}'
 repo_format = '\x02{short_url}\x02 -- {name}: {description} ({owner[login]})'
 repo_format_forkOf = '\x02{short_url}\x02 -- {name}: {description} ({owner[login]} forked from {parent[full_name]})'
@@ -136,7 +136,6 @@ def get_gist(context):
 
 @bot.regex(repo_re)
 def announce_repo(context):
-    if commit_re.match(context.line['message']): return
     return api_format_repo(context.line['regex_search'].groupdict()) or None
 
 
