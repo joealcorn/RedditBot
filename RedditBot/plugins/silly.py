@@ -10,11 +10,11 @@ def squatlylist(context):
 high = 0
 target = 0
 
-seed()
 
 def reset():
     global target
-    target = randint(2, 4)
+    seed()
+    target = randint(3, 5)
 
 @bot.regex('.*')
 def counting(context):
