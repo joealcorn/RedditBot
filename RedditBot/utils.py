@@ -46,5 +46,21 @@ def make_request(url, params={}, method='get', timeout=timeout):
     return r
 
 
+def shorten_url(bot, url):
+    if not 'BITLY_KEY' in bot.config or not 'BITLY_USER' in bot.config:
+        return None
+    par = {
+        'format':  'json',
+        'domain':  'j.mp',
+        'login':   bot.config['BITLY_USER'],
+        'apiKey':  bot.config['BITLY_KEY'],
+        'longUrl': url
+        }
+    r = make_request('http://api.bitly.com/v3/shorten', params=par)
+    if isinstance(r, str): return None
+    if r.status_code == 200:
+        return r.json['data']['url']
+
+
 def unescape_html(string):
     return HTMLParser().unescape(string)
