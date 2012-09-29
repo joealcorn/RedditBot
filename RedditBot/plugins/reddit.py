@@ -5,6 +5,7 @@ import requests
 
 reddit_link = re.compile('http://(?:www\.)?redd(?:\.it/|it\.com/(?:tb|(?:r/[\w\.]+/)?comments)/)(\w+)(/.+/)?(\w{7})?')
 
+any_link_re = re.compile(r'\bhttps?://(?:[\w_]+\.)+[\w_]+(?:/(?:[^ ]*[^.])?)?\b', re.I)
 
 @bot.command
 def reddit(context):
@@ -95,19 +96,32 @@ def announce_reddit(context):
         return line
 
 
+last_link = None
+@bot.regex(any_link_re)
+def link(context):
+    global last_link
+    last_link = context.line['regex_search'].group(0)
+
+
 @bot.command('source')
 def reddit_source(context):
+    if not context.args:
+        context.args = last_link
+    if not context.args:
+        return
     urls = [context.args]
     imgur = re.match(r'\bhttp://i\.imgur\.com/(?P<hash>\w+)\.\b', context.args)
     if imgur:
         print 'imgur link: {hash}'.format(**imgur.groupdict())
         urls.append('http://imgur.com/{hash}'.format(**imgur.groupdict()))
     posts = []
-    for u in urls:
-        r = requests.get('http://www.reddit.com/api/info.json', params={'url': u})
-        posts.extend(r.json['data']['children'])
-    print repr(posts)
-    if not posts:
-        return
+    try:
+        for u in urls:
+            r = requests.get('http://www.reddit.com/api/info.json', params={'url': u})
+            posts.extend(r.json['data']['children'])
+        if not posts:
+            return 'Link is not on reddit'
+    except:
+        return 'Couldn\'t get link data from reddit'
     posts.sort(key=lambda x: x['data']['created'])
     return '/r/{subreddit} -- http://redd.it/{id}'.format(**posts[0]['data'])
