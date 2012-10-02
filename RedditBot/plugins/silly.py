@@ -22,17 +22,13 @@ def counting(context):
     try:
         next = int(context.args)
         if next == 1:
-            print 'a'
             reset()
             high = 0
         if next != high + 1:
-            print 'b'
             high = 0
         else:
-            print 'c'
             high = next
             if next + 1 == target:
-                print 'd'
                 high += 1
                 return str(high)
     except ValueError:
