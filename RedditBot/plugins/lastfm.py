@@ -69,6 +69,6 @@ def compare(user1, user2):
 
     if 'artist' in r['result']['artists']:
         artists = ', '.join([a['name'] for a in r['result']['artists']['artist']])
-        line = line + ' - Common artists include {}'.format(artists)
+        line = line + u' - Common artists include {}'.format(artists)
 
     return line.format(**info)
