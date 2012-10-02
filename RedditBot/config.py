@@ -20,6 +20,10 @@ class Config(object):
     LASTFM_API_KEY = ''
     MCBOUNCER_KEY = ''
     WOLFRAMALPHA_KEY = ''
+    GOOGLESEARCH_KEY = ''
 
     MINECRAFT_USER = ''
     MINECRAFT_PASSWORD = ''
+
+    BITLY_KEY = ''
+    BITLY_USER = ''
