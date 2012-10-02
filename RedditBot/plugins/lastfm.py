@@ -68,7 +68,11 @@ def compare(user1, user2):
     line = u'{user1} vs {user2}: {percent:.0%} similarity'
 
     if 'artist' in r['result']['artists']:
-        artists = ', '.join([a['name'] for a in r['result']['artists']['artist']])
+        if int(r['result']['artists']['@attr']['matches']) < 2:
+            artists = r['result']['artists']['artist']['name']
+        else:
+            artists = ', '.join([a['name'] for a in r['result']['artists']['artist']])
+
         line = line + u' - Common artists include {}'.format(artists)
 
     return line.format(**info)
