@@ -54,7 +54,7 @@ def tellinput(context):
     reply = []
     for user_from, message, time, chan in tells:
         d_time = datetime.fromtimestamp(time)
-        reply.append(u'{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
+        reply.append(u'{0} <{1}> {2}'.format(d_time.strftime('%a %d %b %H:%M'), user_from, message))
 
     if len(tells) > 2:
         p = paste(u'\n'.join(reply), u'Notes for {}'.format(nick))
@@ -98,7 +98,7 @@ def tells(context):
     reply = []
     for user_from, message, time, chan in tells:
         d_time = datetime.fromtimestamp(time)
-        reply.append(u'{0} <{1}> {2}'.format(d_time.strftime('%H:%M'), user_from, message))
+        reply.append(u'{0} <{1}> {2}'.format(d_time.strftime('%a %d %b %H:%M'), user_from, message))
 
     p = paste(u'\n'.join(reply), u'Notes for {}'.format(nick), unlisted=1)
     if p['success'] == False:
