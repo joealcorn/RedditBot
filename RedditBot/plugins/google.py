@@ -31,7 +31,7 @@ def wrap_cse(cx, name=None):
     def wrapped(context):
         r = google_cse(context.args, cx)
         if r.get('success', True):
-            if r['items']:
+            if 'items' in r:
                 output = cse_result.format(**r['items'][0])
                 n = int(r['queries']['request'][0]['totalResults']) - 1
                 if n > 0:
