@@ -7,6 +7,7 @@ reddit_link = re.compile('http://(?:www\.)?redd(?:\.it/|it\.com/(?:tb|(?:r/[\w\.
 
 any_link_re = re.compile(r'\bhttps?://(?:[\w_]+\.)+[\w_]+(?:/(?:[^ ]*[^.])?)?\b', re.I)
 
+
 @bot.command
 def reddit(context):
     '''Usage: .reddit <subreddit>'''
@@ -33,7 +34,7 @@ def reddit(context):
     info = {
         'username': context.line['user'],
         'subreddit': submission['subreddit'],
-        'title': utils.unescape_html(submission['title']),
+        'title': utils.unescape_html(submission['title'].replace('\n', '')),
         'up': submission['ups'],
         'down': submission['downs'],
         'shortlink': 'http://redd.it/' + submission['id']
@@ -82,7 +83,7 @@ def announce_reddit(context):
             return 'Could not fetch json'
 
     info = {
-        'title': utils.unescape_html(submission['title']),
+        'title': utils.unescape_html(submission['title'].replace('\n', '')),
         'up': submission['ups'],
         'down': submission['downs'],
         'shortlink': 'http://redd.it/' + submission['id']
