@@ -41,7 +41,7 @@ def get_video_description(vid_id):
         out += '{0}h '.format(length / 3600)
     if length / 60:
         out += '{0}m '.format(length / 60 % 60)
-    out +='{0}s'.format(length % 60)
+    out += '{0}s'.format(length % 60)
 
     # The use of str.decode() prevents UnicodeDecodeError with some locales
     # See http://stackoverflow.com/questions/4082645/
@@ -51,7 +51,7 @@ def get_video_description(vid_id):
     out += ' - by {0}'.format(data['uploader'])
 
     if 'contentRating' in data:
-        out += ' - \x02\x034NSFW\x02'
+        out = '[NSFW] - ' + out
 
     return out
 
