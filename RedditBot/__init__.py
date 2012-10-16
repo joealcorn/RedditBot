@@ -19,7 +19,12 @@ if not bot.h_config:
 
 from RedditBot.plugins import tell
 db = tell.get_db_connection()
-tell.get_users(db)
+
+try:
+    tell.get_users(db)
+except:
+    tell.db_init(db)
+    tell.get_users(db)
 
 # load our plugins
 from RedditBot.plugins import reddit, twitter, botutils, youtube, badword, tell, minecraft, google,\
