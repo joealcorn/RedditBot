@@ -17,6 +17,8 @@ bot.config.from_object(Config)
 if not bot.h_config:
     bot.h_config = deepcopy(bot.config)
 
+bot.load_config()
+
 from RedditBot.plugins import tell
 db = tell.get_db_connection()
 
@@ -29,4 +31,4 @@ except:
 # load our plugins
 from RedditBot.plugins import reddit, twitter, botutils, youtube, badword, tell, minecraft, google,\
                               lastfm, silly, config, kickrejoin, grab, wolframalpha, mcbouncer, python,\
-                              wikipedia, github
+                              wikipedia, github, countdown

@@ -5,24 +5,7 @@ import os.path
 import copy
 import yaml
 
-blacklist = ['REGEX', 'IGNORE', 'EVENTS', 'CHANNELS', 'PLUGINS', 'START_TIME']
-
-def save_config():
-    with open('bot_config.yml', 'w') as f:
-        f.write(yaml.dump(dict((key, value) for key, value in bot.config.iteritems() if
-            not (key.upper() in blacklist) and
-            (not key in bot.h_config or bot.h_config[key] != value))))
-
-def load_config():
-    if os.path.exists('bot_config.yml'):
-        with open('bot_config.yml', 'r') as f:
-            for key, value in yaml.load(f.read()).iteritems():
-                if not key in bot.config:
-                    bot.config[key] = value
-                elif isinstance(bot.config[key], list):
-                    bot.config[key] = list(set(bot.config[key] + value))
-
-load_config()
+blacklist = ['REGEX', 'IGNORE', 'EVENTS', 'PLUGINS', 'START_TIME']
 
 @bot.command
 def config(context):
@@ -47,18 +30,18 @@ def config(context):
     elif cmd == 'revert':
         if key in bot.h_config:
             bot.config[key] = copy.deepcopy(bot.h_config[key])
-            save_config()
+            bot.save_config()
             bot.reply(repr(bot.config[key]), context.line, False, True, context.line['user'], nofilter = True)
         elif key in bot.config:
             del bot.config[key]
-            save_config()
+            bot.save_config()
             bot.reply('Key deleted.', context.line, False, True, context.line['user'], nofilter = True)
         else:
             bot.reply('Nothing to do.', context.line, False, True, context.line['user'], nofilter = True)
         return
     if cmd == 'set' and (not key in bot.config or isinstance(bot.config[key], str)):
         bot.config[key] = arg
-        save_config()
+        bot.save_config()
         return 'Set.'
     if key in bot.config and not isinstance(bot.config[key], list):
         return
@@ -66,11 +49,11 @@ def config(context):
         bot.config[key] = []
     if cmd == 'add' and not arg in bot.config[key]:
         bot.config[key].append(arg)
-        save_config()
+        bot.save_config()
         return 'Added.'
     elif cmd == 'remove' and (not key in bot.h_config or not (arg in bot.h_config[key])):
         bot.config[key].remove(arg)
         if len(bot.config[key]) == 0 and not key in bot.h_config:
             del bot.config[key]
-        save_config()
+        bot.save_config()
         return 'Removed.'

@@ -6,8 +6,10 @@
 import irctk.bot
 import irctk.plugins
 
+import os
 import time
 import re
+import yaml
 
 from RedditBot.ircglob import glob
 from RedditBot.utils import isignored, isadmin
@@ -20,6 +22,7 @@ class PluginHandler(irctk.plugins.PluginHandler):
             return
         super(PluginHandler, self).enqueue_plugin(plugin, hook, context, regex)
 
+blacklist = ['REGEX', 'IGNORE', 'EVENTS', 'PLUGINS', 'START_TIME']
 
 class Bot(irctk.bot.Bot):
     h_config = None
@@ -29,7 +32,22 @@ class Bot(irctk.bot.Bot):
         self.reply_hook = None
         super(Bot, self).__init__()
         self.plugin = PluginHandler(self)
-
+    
+    def save_config(self):
+        with open('bot_config.yml', 'w') as f:
+            f.write(yaml.dump(dict((key, value) for key, value in self.config.iteritems() if
+                not (key.upper() in blacklist) and
+                (not key in self.h_config or self.h_config[key] != value))))
+    
+    def load_config(self):
+        if os.path.exists('bot_config.yml'):
+            with open('bot_config.yml', 'r') as f:
+                for key, value in yaml.load(f.read()).iteritems():
+                    if not key in self.config or not self.config[key]:
+                        self.config[key] = value
+                    elif isinstance(self.config[key], list):
+                        self.config[key] = list(set(self.config[key] + value))
+    
     def set_reply_hook(self, hook):
         self.reply_hook = hook
 
@@ -67,14 +85,14 @@ class Bot(irctk.bot.Bot):
                     # process regex
                     for regex in self.config['REGEX']:
                         hook = regex['hook']
-                        search = re.search(hook, raw)
+                        search = re.search(hook, args[-1])
                         if not search:
                             continue
                         regex['context'] = dict(self.irc.context)
                         regex['context']['regex_search'] = search
                         self.plugin.enqueue_plugin(regex,
                                                    hook,
-                                                   raw,
+                                                   args[-1],
                                                    regex=True)
                     
                     # process for a message
