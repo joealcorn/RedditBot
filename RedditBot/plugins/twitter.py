@@ -7,6 +7,7 @@ status_url = 'https://api.twitter.com/1/statuses/show/{}.json'
 latest_url = 'http://api.twitter.com/1/statuses/user_timeline.json'
 line = u'@{screen_name}: {tweet}'
 
+
 @bot.regex(tweet_re)
 def announce_tweet(context):
     ''' Announces tweets as they are posted in the channel '''
@@ -34,10 +35,12 @@ def twitter(context):
 
     params = {'screen_name': username, 'count': 1}
     response = utils.make_request(latest_url, params)
-    if not isinstance(response.json, list):
+    if isinstance(response, str):
         return response
-    elif response == []:
-        return 'No results found for that name'
+    elif response.status_code == 404:
+        return 'Nonexistent user'
+    elif response.json == []:
+        return 'That user hasn\'t tweeted yet'
 
     info = {'screen_name': response.json[0]['user']['screen_name'],
             'tweet': response.json[0]['text']}
