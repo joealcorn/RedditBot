@@ -151,7 +151,6 @@ def isup(context):
     server = find_server(context.args)
     if not server:
         match = server_re.match(context.args)
-        print match
         if not match:
             return
         server = (match.group(1), match.group(2) or 25565, 'players')

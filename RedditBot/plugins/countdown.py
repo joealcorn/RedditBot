@@ -2,7 +2,7 @@
 from RedditBot import bot
 
 import ast
-from ast import literal_eval, dump, parse, NodeVisitor
+from ast import parse, NodeVisitor
 from fractions import Fraction
 from decimal import Decimal
 from time import time
@@ -12,78 +12,88 @@ import os
 
 current_game = None
 
+
 class CountdownException(Exception):
     value = None
+
     def __init__(self, value):
         super(Exception, self).__init__()
         self.value = value
+
     def __str__(self):
         return '{0}({1})'.format(self.__class__.__name__, self.value)
 
+
 class IllegalNumber(CountdownException):
     pass
+
 
 class IllegalOperation(CountdownException):
     def __str__(self):
         return 'IllegalOperation({0})'.format(self.value.__class__.__name__)
 
+
 class IllegalNode(CountdownException):
     pass
 
+
 class ResolveExpr(NodeVisitor):
     allowed_numbers = None
-    
+
     def __init__(self, allowed_numbers=None):
         super(ResolveExpr, self).__init__()
         if allowed_numbers != None:
             self.allowed_numbers = [Fraction(n) for n in allowed_numbers]
-    
+
     def use_number(self, n):
         if self.allowed_numbers != None:
             if n not in self.allowed_numbers:
                 raise IllegalNumber(n)
             self.allowed_numbers.remove(n)
         return n
-    
+
     def visit_Num(self, node):
         return self.use_number(Fraction(node.n))
-    
+
     def visit_Add(self, node):
         return lambda x, y: x + y
-    
+
     def visit_Sub(self, node):
         return lambda x, y: x - y
-    
+
     def visit_Mult(self, node):
         return lambda x, y: x * y
-    
+
     def visit_Div(self, node):
         return lambda x, y: x / y
-    
+
     def visit_BinOp(self, node):
         return self.visit(node.op)(self.visit(node.left), self.visit(node.right))
-    
+
     def visit_Expr(self, node):
         return self.visit(node.value)
-        
+
     def visit_Module(self, node):
         return self.visit(node.body[0])
-    
+
     def generic_visit(self, node):
         if isinstance(node, ast.operator):
             raise IllegalOperation(node)
         else:
             raise IllegalNode(node)
 
+
 def test_expr(expr, numbers=None):
     if not isinstance(expr, ast.AST):
         expr = parse(expr)
     return ResolveExpr(numbers).visit(expr)
 
+
 def get_number(big=False):
     random.seed(os.urandom(1024))
     nums = ([25, 50, 75, 100] if big else range(1, 10))
     return random.choice(nums)
+
 
 def exact_or_approx(f):
     if f.denominator <= 10000:
@@ -91,8 +101,10 @@ def exact_or_approx(f):
     else:
         return '~' + str(f.limit_denominator())
 
+
 def as_decimal(n):
     return Decimal(n.numerator) / Decimal(n.denominator)
+
 
 # not really what this module is for, but we may as well include it
 @bot.command('calculate')
@@ -113,12 +125,14 @@ def calc(context, make_decimal=False):
         result = str(e)
     return '{user}: {result}'.format(result=result, **context.line)
 
+
 @bot.command('decimal')
 def decimal(context):
     '''.decimal <expression>'''
     if not context.args:
         return decimal.__doc__
     return calc(context, make_decimal=True)
+
 
 @bot.command('countdown')
 def new_countdown(context):
@@ -132,6 +146,7 @@ def new_countdown(context):
     target = Fraction(random.randint(100, 999))
     current_game = (target, use_nums, time())
     return u'Target: \x02{target}\x02. Use {numbers} and operators +, -, *, /.'.format(target=target, numbers=', '.join(map(str, use_nums)))
+
 
 @bot.regex(re.compile('^[^A-Za-z]*$'))
 def guess_countdown(context):
