@@ -31,8 +31,9 @@ def last_played(user):
 
     r = r.json['recenttracks']
 
-    if int(r['total']) == 0:
-        return 'That user hasn\'t scrobbled anything'
+    if 'total' in r:
+        if int(r['total']) == 0:
+            return 'That user hasn\'t scrobbled anything'
 
     info = {
         'artist': r['track'][0]['artist']['#text'],
