@@ -16,6 +16,7 @@ class Config(object):
     # Plugin specific configs
     REDDIT_BLACKLIST = []
     TWITTER_BLACKLIST = []
+    COUNTDOWN_CHANNELS = ['#countdown']
 
     LASTFM_API_KEY = ''
     MCBOUNCER_KEY = ''

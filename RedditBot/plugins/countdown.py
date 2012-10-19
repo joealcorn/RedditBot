@@ -136,6 +136,9 @@ def decimal(context):
 
 @bot.command('countdown')
 def new_countdown(context):
+    if context.line['sender'].lower() not in bot.config['COUNTDOWN_CHANNELS']:
+        return '{0} not in countdown channel whitelist: [{1}]'.format(context.line['sender'],
+                ','.join(bot.config['COUNTDOWN_CHANNELS']))
     global current_game
     if current_game and time() - current_game[2] < 30:
         return u'{user}: Please wait before starting a new round.'.format(**context.line)
@@ -150,6 +153,8 @@ def new_countdown(context):
 
 @bot.regex(re.compile('^[^A-Za-z]*$'))
 def guess_countdown(context):
+    if context.line['sender'].lower() not in bot.config['COUNTDOWN_CHANNELS']:
+        return
     global current_game
     if not current_game:
         return
