@@ -28,13 +28,13 @@ def get_info(host, port):
     try:
         #Set up our socket
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(2.0)
         s.connect((host, port))
 
         #Send 0xFE: Server list ping
         s.send('\xfe')
 
         #Read as much data as we can (max packet size: 241 bytes)
-        s.settimeout(2.0)
         d = s.recv(256)
         s.close()
 
