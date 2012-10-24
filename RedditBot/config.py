@@ -6,7 +6,7 @@ class Config(object):
     TIMEOUT = 300
     NICK = 'RedditBot'
     REALNAME = 'https://github.com/buttscicles/RedditBot'
-    CHANNELS = ['#RedditMC']
+    CHANNELS = ['#RedditMC', '#countdown']
 
     ADMINS = ['*!*@AlcoJew.staff.reddit-minecraft',
               '*!joe@buttscicl.es',
@@ -14,6 +14,12 @@ class Config(object):
               '*!*@edk141.staff.reddit-minecraft']
 
     # Plugin specific configs
+
+    # This needs to a valid SQLAlchemy connection string
+    # Find one for your preferred db + driver here:
+    # http://docs.sqlalchemy.org/en/rel_0_7/core/engines.html
+    TELL_DB = 'sqlite:///{0}.{1}.db'.format(NICK, SERVER)
+
     REDDIT_BLACKLIST = []
     TWITTER_BLACKLIST = []
     COUNTDOWN_CHANNELS = ['#countdown']

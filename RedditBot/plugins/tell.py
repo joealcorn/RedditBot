@@ -1,150 +1,117 @@
-# ported from skybot
-
-from RedditBot import bot, utils
+from RedditBot import bot
+from RedditBot.utils import generate_insult
 from RedditBot.pastebin import paste
 
-from itertools import imap
+from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 from datetime import datetime
-import time
-
-import sqlite3
 
 
-def get_db_connection(name=None):
-    if name is None:
-        name = '{0}.{1}.db'.format(bot.config['NICK'], bot.config['SERVER'])
-    return sqlite3.connect(name, timeout=10)
+engine = create_engine(bot.config['TELL_DB'], echo=False)
+Base = declarative_base()
+session_factory = sessionmaker(bind=engine)
+Session = scoped_session(session_factory)
 
 
-def db_init(db):
-    db.execute('create table if not exists tell'
-               '(id integer primary key asc, user_to, user_from, message, chan, time)')
-    db.commit()
+class tells(Base):
+    __tablename__ = 'tells'
+
+    id = Column(Integer, primary_key=True)
+    user_to = Column(String(50))
+    user_from = Column(String(50))
+    message = Column(String(512))
+    channel = Column(String(50))
+    time = Column(DateTime)
+
+    def __init__(self, user_to, user_from, message, channel):
+        self.user_to = user_to
+        self.user_from = user_from
+        self.message = message
+        self.channel = channel
+        self.time = datetime.utcnow()
 
 
-def get_tells(db, user_to):
-    return db.execute('select user_from, message, time, chan from tell where'
-                      ' user_to=lower(?) order by time',
-                      (user_to.lower(),)).fetchall()
+def get_users():
+    session = Session()
+    users = session.query(tells.user_to).distinct()
+    bot.data['TELL_USERS'] = [u.user_to for u in users]
 
 
-def get_users(db):
-    users = [user[0].lower() for user in db.execute('select distinct user_to from tell').fetchall()]
-    bot.data['TELL_USERS'] = users
+def make_date_string(date):
+    if date.day != datetime.utcnow().day:
+        return date.strftime('%d %b %H:%M')
+    else:
+        return date.strftime('%H:%M')
+
+
+@bot.command('tell')
+def new_tell(context):
+    '''.tell <nick> <message>'''
+
+    query = context.args.split(' ', 1)
+    user_from = context.line['user']
+    channel = context.line['sender']
+
+    if len(query) != 2:
+        return new_tell.__doc__
+
+    user_to = query[0].lower()
+    message = query[1].strip()
+
+    if user_to == user_from.lower():
+        return 'You can tell yourself that, you {0}.'.format(generate_insult())
+    elif user_to == bot.irc.nick.lower():
+        return 'No, you {0}.'.format(generate_insult())
+
+    if channel.lower() == user_from.lower():
+        channel = 'a pm'
+
+    session = Session()
+
+    t = tells(user_to, user_from, message, channel)
+    session.add(t)
+    session.commit()
+    Session.remove()
+    get_users()
+
+    return u'{0}: I\'ll tell {1} that when I see them.'.format(
+             user_from, user_to)
 
 
 @bot.event('PRIVMSG')
-def tellinput(context):
+def tell_user(context):
     nick = context.line['user']
 
     if nick.lower() not in bot.data['TELL_USERS']:
         return
 
-    db = get_db_connection()
-    try:
-        tells = get_tells(db, nick)
-    except db.OperationalError:
-        db_init(db)
-        tells = get_tells(db, nick)
+    session = Session()
+    messages = session.query(tells).filter_by(user_to=nick.lower()).all()
 
-    if len(tells) == 0:
+    if not messages:
+        Session.remove()
         return
 
-    reply = []
-    for user_from, message, time, chan in tells:
-        d_time = datetime.fromtimestamp(time)
-        reply.append(u'{0} <{1}> {2}'.format(d_time.strftime('%a %d %b %H:%M'), user_from, message))
+    msgs = [u'{0} <{1}> {2}'.format(make_date_string(message.time),
+             message.user_from, message.message) for message in messages]
 
-    if len(tells) > 2:
-        p = paste(u'\n'.join(reply), u'Notes for {}'.format(nick))
-        if p['success'] == True:
-            db.execute('delete from tell where user_to=lower(?)', (nick,))
-            db.commit()
-            get_users(db)
+    if len(msgs) > 2:
+        p = paste('\n'.join(msgs), u'Notes for {0}'.format(nick))
+
+        if p['success']:
+            map(session.delete, messages)
+            session.commit()
+            Session.remove()
+            get_users()
+            return u'{0}: See {1} for your messages'.format(nick, p['url'])
         else:
+            Session.remove()
             return
-
-        return u'{0}: See {1} for your messages.'.format(nick, p['url'])
     else:
-        db.execute('delete from tell where user_to=lower(?)', (nick,))
-        db.commit()
-        get_users(db)
-        return u'\n'.join(imap(lambda x: u'{0}: {1}'.format(nick, x), reply))
-
-
-@bot.command
-def tells(context):
-    '''.tells <nick>'''
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
-    nick = context.args
-
-    db = get_db_connection()
-
-    try:
-        tells = get_tells(db, nick)
-    except db.OperationalError:
-        db_init(db)
-        tells = get_tells(db, nick)
-
-    if len(tells) == 0:
-        return
-
-    db.execute('delete from tell where user_to=lower(?)', (nick,))
-    db.commit()
-    get_users(db)
-
-    reply = []
-    for user_from, message, time, chan in tells:
-        d_time = datetime.fromtimestamp(time)
-        reply.append(u'{0} <{1}> {2}'.format(d_time.strftime('%a %d %b %H:%M'), user_from, message))
-
-    p = paste(u'\n'.join(reply), u'Notes for {}'.format(nick), unlisted=1)
-    if p['success'] == False:
-        bot.reply(u'Could not paste notes: {}'.format(p['error']), context.line, False, True, context.line['user'])
-        return
-    else:
-        bot.reply(p['url'], context.line, False, True, context.line['user'])
-        return
-
-
-@bot.command
-def tell(context):
-    '''.tell <nick> <message>'''
-
-    query = context.args.split(' ', 1)
-    nick = context.line['user']
-    chan = context.line['sender']
-
-    if len(query) != 2:
-        return tell.__doc__
-
-    user_to = query[0].lower()
-    message = query[1].strip()
-    user_from = nick
-
-    if chan.lower() == user_from.lower():
-        chan = 'a pm'
-
-    if user_to == user_from.lower():
-        return 'No.'
-
-    db = get_db_connection()
-
-    for i in range(2):
-        try:
-            db.execute('insert into tell(user_to, user_from, message, chan, '
-                       'time) values(?,?,?,?,?)', (user_to,
-                                                   user_from,
-                                                   message,
-                                                   chan,
-                                                   time.time()))
-            db.commit()
-            get_users(db)
-        except db.IntegrityError:
-            return 'Message has already been queued.'
-        except db.OperationalError:
-            db_init(db)
-        else:
-            return u'{0}: I\'ll tell {1} that when I see them.'.format(nick, query[0])
+        map(session.delete, messages)
+        session.commit()
+        Session.remove()
+        get_users()
+        return u'{0}: {1}'.format(nick, '\n{0}: '.format(nick).join(msgs))

@@ -1,11 +1,11 @@
 
 from RedditBot import bot, utils
 
-import os.path
 import copy
-import yaml
+
 
 blacklist = ['REGEX', 'IGNORE', 'EVENTS', 'PLUGINS', 'START_TIME']
+
 
 @bot.command
 def config(context):
@@ -16,7 +16,7 @@ def config(context):
     if not (cmd in ['list', 'set', 'add', 'remove', 'view', 'revert']):
         return
     if cmd == 'list':
-        bot.reply(repr(bot.config.keys()), context.line, False, True, context.line['user'], nofilter = True)
+        bot.reply(repr(bot.config.keys()), context.line, False, True, context.line['user'], nofilter=True)
         return
     cmd, key = str(context.args).split(' ', 1)
     if len(key.split(' ', 1)) > 1:
@@ -24,20 +24,20 @@ def config(context):
     if key.upper() in blacklist:
         return
     if cmd == 'view':
-        if key in bot.config and not key.upper().endswith('_PASSWORD') and not key.upper().endswith('_KEY'):
-            bot.reply(repr(bot.config[key]), context.line, False, True, context.line['user'], nofilter = True)
+        if key in bot.config and not key.upper().endswith(('_PASSWORD', '_KEY', 'TELL_DB')):
+            bot.reply(repr(bot.config[key]), context.line, False, True, context.line['user'], nofilter=True)
         return
     elif cmd == 'revert':
         if key in bot.h_config:
             bot.config[key] = copy.deepcopy(bot.h_config[key])
             bot.save_config()
-            bot.reply(repr(bot.config[key]), context.line, False, True, context.line['user'], nofilter = True)
+            bot.reply(repr(bot.config[key]), context.line, False, True, context.line['user'], nofilter=True)
         elif key in bot.config:
             del bot.config[key]
             bot.save_config()
-            bot.reply('Key deleted.', context.line, False, True, context.line['user'], nofilter = True)
+            bot.reply('Key deleted.', context.line, False, True, context.line['user'], nofilter=True)
         else:
-            bot.reply('Nothing to do.', context.line, False, True, context.line['user'], nofilter = True)
+            bot.reply('Nothing to do.', context.line, False, True, context.line['user'], nofilter=True)
         return
     if cmd == 'set' and (not key in bot.config or isinstance(bot.config[key], str)):
         bot.config[key] = arg

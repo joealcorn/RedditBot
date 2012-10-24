@@ -19,14 +19,6 @@ if not bot.h_config:
 
 bot.load_config()
 
-from RedditBot.plugins import tell
-db = tell.get_db_connection()
-
-try:
-    tell.get_users(db)
-except:
-    tell.db_init(db)
-    tell.get_users(db)
 
 # load our plugins
 from RedditBot.plugins import (reddit, twitter, botutils, youtube, badword, tell, minecraft, google,
@@ -35,3 +27,7 @@ from RedditBot.plugins import (reddit, twitter, botutils, youtube, badword, tell
 
 # Available plugins that aren't loaded by default
 # from RedditBot.plugins import eval
+
+if 'RedditBot.plugins.tell' in sys.modules:
+    tell.Base.metadata.create_all(tell.engine)
+    tell.get_users()
