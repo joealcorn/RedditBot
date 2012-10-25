@@ -77,7 +77,7 @@ def new_tell(context):
     get_users()
 
     return u'{0}: I\'ll tell {1} that when I see them.'.format(
-             user_from, user_to)
+             user_from, query[0])
 
 
 @bot.event('PRIVMSG')
