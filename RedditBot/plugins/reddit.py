@@ -106,23 +106,29 @@ def link(context):
 
 @bot.command('source')
 def reddit_source(context):
-    if not context.args:
-        context.args = last_link
-    if not context.args:
+    if not context.args and not last_link:
         return
+    elif not context.args:
+        context.args = last_link
+
+    posts = []
     urls = [context.args]
     imgur = re.match(r'\bhttp://i\.imgur\.com/(?P<hash>\w+)\.\b', context.args)
+
     if imgur:
         print 'imgur link: {hash}'.format(**imgur.groupdict())
         urls.append('http://imgur.com/{hash}'.format(**imgur.groupdict()))
-    posts = []
+
     try:
         for u in urls:
             r = requests.get('http://www.reddit.com/api/info.json', params={'url': u})
             posts.extend(r.json['data']['children'])
         if not posts:
-            return 'Link is not on reddit'
+            return '{0}: Link is not on reddit'.format(context.line['user'])
     except:
         return 'Couldn\'t get link data from reddit'
+
     posts.sort(key=lambda x: x['data']['created'])
-    return '/r/{subreddit} -- http://redd.it/{id}'.format(**posts[0]['data'])
+
+    return (u'{0}: /r/{subreddit} - \'{title}\' - +{ups}/-{downs} - http://redd.it/{id}'
+             .format(context.line['user'], **posts[0]['data']))
