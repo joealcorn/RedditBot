@@ -42,9 +42,10 @@ def reddit(context):
         'title': utils.unescape_html(submission['title'].replace('\n', '')),
         'up': submission['ups'],
         'down': submission['downs'],
+        'nsfw': '\x02[NSFW]\x02 ' if submission['over_18'] else '',
         'shortlink': 'http://redd.it/' + submission['id']
     }
-    line = u'{username}: /r/{subreddit} \'{title}\' +{up}/-{down} {shortlink}'.format(**info)
+    line = u'{username}: /r/{subreddit} {nsfw}\'{title}\' +{up}/-{down} {shortlink}'.format(**info)
     return line
 
 
@@ -136,6 +137,10 @@ def reddit_source(context):
     posts.sort(key=lambda x: x['data']['created'])
     if not posts:
         return '{0}: Don\'t try to confuse me!'.format(context.line['user'])
+    
+    post = posts[0]['data']
+    post['nsfw'] = '\x02[NSFW]\x02 ' if post['over_18'] else ''
 
-    return (u'{0}: /r/{subreddit} - \'{title}\' - +{ups}/-{downs} - http://redd.it/{id}'
-             .format(context.line['user'], **posts[0]['data']))
+    return (u'{0}: /r/{subreddit} - {nsfw}\'{title}\' - +{ups}/-{downs} - http://redd.it/{id}'
+             .format(context.line['user'], **post))
+
