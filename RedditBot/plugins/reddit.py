@@ -7,6 +7,11 @@ reddit_link = re.compile('http://(?:www\.)?redd(?:\.it/|it\.com/(?:tb|(?:r/[\w\.
 
 any_link_re = re.compile(r'\bhttps?://(?:[\w_]+\.)+[\w_]+(?:/(?:[^ ]*[^.])?)?\b', re.I)
 
+def is_blacklisted(sr):
+    if isinstance(sr, basestring):
+        sr = sr.split('+')
+    print 'check', repr(sr)
+    return any(r.lower().split('/')[0] in bot.config['REDDIT_BLACKLIST'] for r in sr)
 
 @bot.command
 def reddit(context):
@@ -15,7 +20,7 @@ def reddit(context):
     params = {}
     if subreddit is '':
         return 'Usage: .reddit <subreddit>'
-    elif any(r.lower().split('/')[0] in bot.config['REDDIT_BLACKLIST'] for r in subreddit.split('+')):
+    elif is_blacklisted(subreddit):
         return 'No.'
     elif subreddit.lower().endswith(('/new', '/new/')):
         # reddit occasionally returns fuck all if the query string is not added
@@ -81,20 +86,19 @@ def announce_reddit(context):
             submission = submission.json[0]['data']['children'][0]['data']
         except Exception:
             return 'Could not fetch json'
+    
+    if is_blacklisted(submission['subreddit']):
+        return # don't give them the satisfaction!
 
     info = {
         'title': utils.unescape_html(submission['title'].replace('\n', '')),
         'up': submission['ups'],
         'down': submission['downs'],
-        'shortlink': 'http://redd.it/' + submission['id']
+        'shortlink': 'http://redd.it/' + submission['id'],
+        'nsfw': '\x02[NSFW]\x02 ' if submission['over_18'] else '',
+        'comment': '[Comment] ' if context.line['regex_search'].group(3) else ''
     }
-    line = u'\'{title}\' - +{up}/-{down} - {shortlink}'.format(**info)
-    if context.line['regex_search'].group(3):
-        # Link to comment
-        return '[Comment] ' + line
-    else:
-        # Link to submission
-        return line
+    return u'{nsfw}{comment}\'{title}\' - +{up}/-{down} - {shortlink}'.format(**info)
 
 
 last_link = None
@@ -127,8 +131,11 @@ def reddit_source(context):
             return '{0}: Link is not on reddit'.format(context.line['user'])
     except:
         return 'Couldn\'t get link data from reddit'
-
+    
+    posts = [x for x in posts if not is_blacklisted(x['data']['subreddit'])]
     posts.sort(key=lambda x: x['data']['created'])
+    if not posts:
+        return '{0}: Don\'t try to confuse me!'.format(context.line['user'])
 
     return (u'{0}: /r/{subreddit} - \'{title}\' - +{ups}/-{downs} - http://redd.it/{id}'
              .format(context.line['user'], **posts[0]['data']))
