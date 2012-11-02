@@ -15,7 +15,7 @@ def reddit(context):
     params = {}
     if subreddit is '':
         return 'Usage: .reddit <subreddit>'
-    elif subreddit.lower().split('/')[0] in bot.config['REDDIT_BLACKLIST']:
+    elif any(r.lower().split('/')[0] in bot.config['REDDIT_BLACKLIST'] for r in subreddit.split('+')):
         return 'No.'
     elif subreddit.lower().endswith(('/new', '/new/')):
         # reddit occasionally returns fuck all if the query string is not added
