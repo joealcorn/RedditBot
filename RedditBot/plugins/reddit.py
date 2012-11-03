@@ -10,7 +10,7 @@ any_link_re = re.compile(r'\bhttps?://(?:[\w_]+\.)+[\w_]+(?:/(?:[^ ]*[^.])?)?\b'
 def is_blacklisted(sr):
     if isinstance(sr, basestring):
         sr = sr.split('+')
-    print 'check', repr(sr)
+
     return any(r.lower().split('/')[0] in bot.config['REDDIT_BLACKLIST'] for r in sr)
 
 @bot.command
@@ -42,10 +42,10 @@ def reddit(context):
         'title': utils.unescape_html(submission['title'].replace('\n', '')),
         'up': submission['ups'],
         'down': submission['downs'],
-        'nsfw': '\x02[NSFW]\x02 ' if submission['over_18'] else '',
+        'nsfw': '[NSFW] - ' if submission['over_18'] else '',
         'shortlink': 'http://redd.it/' + submission['id']
     }
-    line = u'{username}: /r/{subreddit} {nsfw}\'{title}\' +{up}/-{down} {shortlink}'.format(**info)
+    line = u'{username}: /r/{subreddit} - {nsfw}\'{title}\' - +{up}/-{down} - {shortlink}'.format(**info)
     return line
 
 
@@ -96,8 +96,8 @@ def announce_reddit(context):
         'up': submission['ups'],
         'down': submission['downs'],
         'shortlink': 'http://redd.it/' + submission['id'],
-        'nsfw': '\x02[NSFW]\x02 ' if submission['over_18'] else '',
-        'comment': '[Comment] ' if context.line['regex_search'].group(3) else ''
+        'nsfw': '[NSFW] - ' if submission['over_18'] else '',
+        'comment': '[Comment] - ' if context.line['regex_search'].group(3) else ''
     }
     return u'{nsfw}{comment}\'{title}\' - +{up}/-{down} - {shortlink}'.format(**info)
 
@@ -139,7 +139,7 @@ def reddit_source(context):
         return '{0}: Don\'t try to confuse me!'.format(context.line['user'])
     
     post = posts[0]['data']
-    post['nsfw'] = '\x02[NSFW]\x02 ' if post['over_18'] else ''
+    post['nsfw'] = '[NSFW] - ' if post['over_18'] else ''
 
     return (u'{0}: /r/{subreddit} - {nsfw}\'{title}\' - +{ups}/-{downs} - http://redd.it/{id}'
              .format(context.line['user'], **post))
