@@ -48,6 +48,12 @@ class Bot(irctk.bot.Bot):
                     elif isinstance(self.config[key], list):
                         self.config[key] = list(set(self.config[key] + value))
     
+    def log(self, context, *args):
+        if not self.config['SNOOP_CHANNEL']: return
+        args = list(args)
+        end = args.pop()
+        self.irc.send_message(self.config['SNOOP_CHANNEL'], '\x02{0}\x02 {1} {2}'.format(context['user'], ':'.join(args), end))
+    
     def set_reply_hook(self, hook):
         self.reply_hook = hook
 

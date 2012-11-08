@@ -11,6 +11,7 @@ def eval(context):
         return
     if context.args:
         try:
+            bot.log(context.line, 'EVAL', context.args)
             return str(__builtin__.eval(context.args))
         except:
             return repr(sys.exc_info()[1])

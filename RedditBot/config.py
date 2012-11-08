@@ -12,6 +12,8 @@ class Config(object):
               '*!joe@buttscicl.es',
               '*!edk141@edk141.co.uk',
               '*!*@edk141.staff.reddit-minecraft']
+    
+    REJOIN_KICKERS = ['SpamServ']
 
     # Plugin specific configs
 
@@ -23,6 +25,7 @@ class Config(object):
     REDDIT_BLACKLIST = []
     TWITTER_BLACKLIST = []
     COUNTDOWN_CHANNELS = ['#countdown']
+    SNOOP_CHANNEL = ''
 
     LASTFM_API_KEY = ''
     MCBOUNCER_KEY = ''
