@@ -58,7 +58,7 @@ def raw(context):
     if context.args:
         command = context.args.split(' ', 1)[0]
         args = list(context.args.split(' ', 1)[-1])
-        bot.log(context.line, 'RAW', context.args)
+        bot.log(context, ('RAW'), context.args)
         bot.irc.send_command(command, args)
     else:
         return raw.__doc__
@@ -70,7 +70,7 @@ def inject(context):
     if not utils.isadmin(context.line['prefix'], bot):
         return
     if context.args:
-        bot.log(context.line, 'INJECT', context.args)
+        bot.log(context, ('INJECT'), context.args)
         bot.inject_input(context.args)
     else:
         return inject.__doc__
@@ -96,7 +96,7 @@ def ignore(context):
 
         save_ignores()
         
-        bot.log(context.line, 'IGNORE', '+{0}{1}'.format(context.args, (' -' + ' -'.join(removed)) if removed else ''))
+        bot.log(context, ('IGNORE'), '+{0}{1}'.format(context.args, (' -' + ' -'.join(removed)) if removed else ''))
 
         if removed:
             return 'Ignored and removed \x02%d\x02 redundant ignores: \x02%s\x02' % (len(removed), '\x02, \x02'.join(removed))
@@ -122,7 +122,7 @@ def unignore(context):
         
         bot.config['IGNORE'] = list(ifilterfalse(filter, bot.config['IGNORE']))
         
-        bot.log(context.line, 'IGNORE', '-{0}'.format(' -'.join(subsets)))
+        bot.log(context, ('IGNORE'), '-{0}'.format(' -'.join(subsets)))
         
         save_ignores()
 
@@ -173,9 +173,9 @@ def uptime(context):
 def invite(context):
     for channel in bot.config['CHANNELS']:
         if channel.lower().split(' ')[0] == context.line['args'][-1].lower():
-            bot.log(context.line, 'INVITE', context.line['args'][-1])
+            bot.log(context, ('INVITE'), context.line['args'][-1])
             bot.irc.send_command('JOIN', channel)
             return
     if utils.isadmin(context.line['prefix'], bot):
-        bot.log(context.line, 'INVITE', 'OVERRIDE', context.line['args'][-1])
+        bot.log(context, ('INVITE', 'OVERRIDE'), context.line['args'][-1])
         bot.irc.send_command('JOIN', context.line['args'][-1])

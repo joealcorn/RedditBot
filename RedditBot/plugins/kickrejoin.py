@@ -13,7 +13,7 @@ def kick(context):
     if context.line['args'][1] != bot.irc.nick: return
     
     kicked_from = context.line['args'][0]
-    bot.log(context.line, 'KICK', '{0} ({1})'.format(kicked_from, context.line['args'][-1]))
+    bot.log(context, ('KICK'), '{0} ({1})'.format(kicked_from, context.line['args'][-1]))
     
     if context.line['user'].lower() in [x.lower() for x in bot.config['REJOIN_KICKERS']]:
         # for channel keys

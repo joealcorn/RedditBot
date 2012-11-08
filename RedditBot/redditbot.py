@@ -6,13 +6,17 @@
 import irctk.bot
 import irctk.plugins
 
+import inspect
 import os
-import time
 import re
+import sys
+import time
+import traceback
 import yaml
 
 from RedditBot.ircglob import glob
 from RedditBot.utils import isignored, isadmin
+from RedditBot.pastebin import paste
 
 
 class PluginHandler(irctk.plugins.PluginHandler):
@@ -21,6 +25,42 @@ class PluginHandler(irctk.plugins.PluginHandler):
         if glob.is_valid(prefix) and isignored(prefix, self.bot) and not isadmin(prefix, self.bot):
             return
         super(PluginHandler, self).enqueue_plugin(plugin, hook, context, regex)
+    
+    # unfortunately we have to override this to catch an exception at func()
+    def dequeue_plugin(self, plugin, plugin_context):
+        for func in plugin['funcs']:
+            takes_args = inspect.getargspec(func).args
+            
+            action = False
+            if plugin.get('action') == True:
+                action = True
+            
+            notice = False
+            if plugin.get('notice') == True:
+                notice = True
+            
+            try:
+                if takes_args:
+                    message = func(plugin_context)
+                else:
+                    message = func()
+            except:
+                etype = sys.exc_info()[0]
+                plg = func.__module__
+                full = ''.join(traceback.format_exception(*sys.exc_info()))
+                baby = ''.join(traceback.format_tb(sys.exc_info()[2], 1)).split('\n')
+                try:
+                    p = paste(full, title='Internal {0}'.format(etype.__name__), unlisted=1, language='pytraceback')
+                    if 'url' in p:
+                        self.bot.log((plg, 'EXCEPTION'), etype.__name__, p['url'])
+                    else:
+                        raise Exception()
+                except:
+                    self.bot.log((plg, 'EXCEPTION', 'PASTE_FAILED'), etype.__name__, baby)
+                return
+            
+            if message:
+                self._reply(message, plugin_context.line, action, notice)
 
 blacklist = ['REGEX', 'IGNORE', 'EVENTS', 'PLUGINS', 'START_TIME']
 
@@ -48,11 +88,23 @@ class Bot(irctk.bot.Bot):
                     elif isinstance(self.config[key], list):
                         self.config[key] = list(set(self.config[key] + value))
     
-    def log(self, context, *args):
+    def format_for_log(self, thing):
+        if isinstance(thing, basestring):
+            return thing
+        elif isinstance(thing, irctk.plugins.Context):
+            return u'\x02{0}\x02'.format(thing.line['user'])
+        elif isinstance(thing, dict):
+            return u' '.join(u'{0}={1}'.format(*item) for items in thing.items())
+        elif isinstance(thing, tuple):
+            return u':'.join(thing)
+        elif isinstance(thing, list):
+            return u', '.join(thing)
+        else:
+            return unicode(thing)
+    
+    def log(self, *args):
         if not self.config['SNOOP_CHANNEL']: return
-        args = list(args)
-        end = args.pop()
-        self.irc.send_message(self.config['SNOOP_CHANNEL'], '\x02{0}\x02 {1} {2}'.format(context['user'], ':'.join(args), end))
+        self.irc.send_message(self.config['SNOOP_CHANNEL'], u' '.join(self.format_for_log(x) for x in args))
     
     def set_reply_hook(self, hook):
         self.reply_hook = hook

@@ -45,7 +45,7 @@ def addbadword(context):
     if len(removed) > 0:
         bot.reply('Removed \x02%d\x02 redundant badwords: \x02%s\x02' % (len(removed), '\x02, \x02'.join(removed)),
             context.line, False, True, context.line['user'], nofilter = True)
-    bot.log(context.line, 'BADWORD', 'ADD', context.args)
+    bot.log(context, ('BADWORD', 'ADD'), context.args)
     return 'Added.'
 
 @bot.command
@@ -57,7 +57,7 @@ def delbadword(context):
     old = len(badwords)
     badwords = list(ifilter(lambda word: word != context.args.lower(), badwords))
     save_badwords()
-    bot.log(context.line, 'BADWORD', 'DEL', context.args)
+    bot.log(context, ('BADWORD', 'DEL'), context.args)
     return 'Removed \x02%d\x02 badwords.' % (old - len(badwords))
 
 @bot.command
