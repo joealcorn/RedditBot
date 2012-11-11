@@ -4,6 +4,8 @@ class Config(object):
     PORT = 6667
     SSL = False
     TIMEOUT = 300
+    DEBUG = False
+
     NICK = 'RedditBot'
     REALNAME = 'https://github.com/buttscicles/RedditBot'
     CHANNELS = ['#RedditMC', '#countdown']
@@ -12,7 +14,7 @@ class Config(object):
               '*!joe@buttscicl.es',
               '*!edk141@edk141.co.uk',
               '*!*@edk141.staff.reddit-minecraft']
-    
+
     REJOIN_KICKERS = ['SpamServ']
 
     # Plugin specific configs

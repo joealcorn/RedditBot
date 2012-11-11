@@ -49,6 +49,11 @@ class PluginHandler(irctk.plugins.PluginHandler):
                 plg = func.__module__
                 full = ''.join(traceback.format_exception(*sys.exc_info()))
                 baby = ''.join(traceback.format_tb(sys.exc_info()[2], 1)).split('\n')
+
+                if self.config['DEBUG'] or not self.config['SNOOP_CHANNEL']:
+                    sys.stderr.write(full)
+                    return
+
                 try:
                     p = paste(full, title='Internal {0}'.format(etype.__name__), unlisted=1, language='pytraceback')
                     if 'url' in p:
