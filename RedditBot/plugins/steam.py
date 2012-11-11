@@ -15,6 +15,9 @@ def store(context):
     r = utils.make_request(url)
     if isinstance(r, str):
         return r
+    elif len(r.history) > 0:
+        # Steam wanted to check our age or the app doesn't exist
+        return
 
     soup = BeautifulSoup(r.content)
     info = {
