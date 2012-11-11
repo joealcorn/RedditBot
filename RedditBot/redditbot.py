@@ -95,7 +95,7 @@ class Bot(irctk.bot.Bot):
         elif isinstance(thing, irctk.plugins.Context):
             return u'\x02{0}\x02'.format(thing.line['user'])
         elif isinstance(thing, dict):
-            return u' '.join(u'{0}={1}'.format(*item) for items in thing.items())
+            return u' '.join(u'{0}={1}'.format(*item) for item in thing.items())
         elif isinstance(thing, tuple):
             return u':'.join(thing)
         elif isinstance(thing, list):
