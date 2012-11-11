@@ -2,7 +2,7 @@ from RedditBot import bot, utils
 from bs4 import BeautifulSoup
 
 
-store_re = r'https?://store.steampowered.com/app/(?:\d{6})'
+store_re = r'https?://store.steampowered.com/app/(?:\d+)'
 store_line = u'{title} on Steam - {price}'
 
 title_attrs = {'class': 'apphub_AppName'}
