@@ -142,6 +142,7 @@ def reddit_source(context):
 
     post = posts[0]['data']
     post['nsfw'] = '[NSFW] - ' if post['over_18'] else ''
+    post['title'] = post['title'].replace('\n', '')
 
     return (u'{0}: /r/{subreddit} - {nsfw}\'{title}\' - +{ups}/-{downs} - http://redd.it/{id}'
              .format(context.line['user'], **post))
