@@ -99,7 +99,7 @@ def api_format_repo(info, verbose=False):
     repo['description'] = repo['description'].strip()
     repo['short_url'] = gitio_shorten(repo['html_url'])
     format = repo_format_forkOf if repo['fork'] else repo_format
-    return format.format(**repo) 
+    return format.format(**repo)
 
 
 @bot.regex(commit_re)

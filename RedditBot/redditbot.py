@@ -32,11 +32,11 @@ class PluginHandler(irctk.plugins.PluginHandler):
             takes_args = inspect.getargspec(func).args
 
             action = False
-            if plugin.get('action') == True:
+            if plugin.get('action'):
                 action = True
 
             notice = False
-            if plugin.get('notice') == True:
+            if plugin.get('notice'):
                 notice = True
 
             try:
@@ -117,7 +117,7 @@ class Bot(irctk.bot.Bot):
         self.reply_hook = hook
 
     def reply(self, message, context, action=False, notice=False,
-            recipient=None, line_limit=400, max_lines=3, **kwargs):
+              recipient=None, line_limit=400, max_lines=3, **kwargs):
         # deal with reply hook for badwords
         if not kwargs.get('nofilter', False) and self.reply_hook:
             message = self.reply_hook(message)

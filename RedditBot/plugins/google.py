@@ -13,14 +13,17 @@ cse_result_more_results = ' -- more result{s} at {link}'
 cse_result_n_more_results = ' -- {n} more result{s} at {link}'
 
 cse = {
-    'xkcd':         '012652707207066138651:zudjtuwe28q'
+    'xkcd': '012652707207066138651:zudjtuwe28q'
     }
 
 
 def google_cse(query, cx, key=None):
     if not key:
-        if 'GOOGLESEARCH_KEY' in bot.config: key = bot.config['GOOGLESEARCH_KEY']
-        else: return {'success': False, 'error': 'Google Custom Search key not configured'}
+        if 'GOOGLESEARCH_KEY' in bot.config:
+            key = bot.config['GOOGLESEARCH_KEY']
+        else:
+            return {'success': False, 'error': 'Google Custom Search key not configured'}
+
     r = utils.make_request(cse_url, params={'key': key, 'cx': cx, 'q': query})
     if isinstance(r, str):
         return {'success': False, 'error': r}
@@ -74,4 +77,3 @@ def google(context):
     ret = title + ' - ' + first_result['unescapedUrl']
 
     return u'{0}: {1}'.format(context.line['user'], ret)
-

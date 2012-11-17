@@ -8,6 +8,7 @@ scrollback = {}
 
 action_re = re.compile(r'^\x01ACTION (.*)\x01$', re.I)
 
+
 @bot.event('PRIVMSG')
 def add_to_scrollback(context):
     if not context.line['sender'].startswith('#'):
@@ -17,9 +18,10 @@ def add_to_scrollback(context):
     if context.line['sender'].lower() not in scrollback:
         scrollback[context.line['sender'].lower()] = []
     s = scrollback[context.line['sender'].lower()]
-    
+
     s.append((context.line['user'], context.line['message']))
     s[:] = s[-100:]
+
 
 def format_line((user, message)):
     match = action_re.match(message)
@@ -27,6 +29,7 @@ def format_line((user, message)):
         return '* {0} {1}'.format(user, match.group(1))
     else:
         return '<{0}> {1}'.format(user, message)
+
 
 @bot.command
 def grab(context):
@@ -48,7 +51,7 @@ def grab(context):
                 if str2 in line[1].lower():
                     r.extend(s)
                     s = []
-                    break # make matching non-greedy, unsure if this is good thing
+                    break  # make matching non-greedy, unsure if this is good thing
     else:
         str1 = context.args.lower().strip()
         for line in scrollback[context.line['sender'].lower()]:

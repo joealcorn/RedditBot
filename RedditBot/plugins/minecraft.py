@@ -46,7 +46,7 @@ def get_info(host, port):
         #Remove the packet ident (0xFF) and the short containing the length of the string
         #Decode UCS-2 string
         d = d[3:].decode('utf-16be')
-        
+
         #If the response string starts with simolean1, then we're dealing with the new response
         if (d.startswith(u'\xa7' + '1')):
             d = d.split(u'\x00')
@@ -62,7 +62,7 @@ def get_info(host, port):
             return {'motd':         d[0],
                     'players':   int(d[1]),
                     'max_players': int(d[2])}
-                    
+
     except Exception, e:
         print e
         return False
@@ -137,6 +137,7 @@ def status(context):
         if not info:
             return '{} seems to be down'.format(host)
         return '{motd}: [{players}/{max_players}]'.format(**info)
+
     def mcb_info():
         up = mcb_status()['success']
         return 'MCBouncer: {}'.format('Up!' if up else 'Down')

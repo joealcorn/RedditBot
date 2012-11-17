@@ -11,6 +11,7 @@ badwords = []
 
 save_badwords_lock = threading.Lock()
 
+
 def save_badwords():
     global badwords
     print 'Saving the badword list...'
@@ -22,6 +23,7 @@ if os.path.exists('bot_badword.txt'):
     with open('bot_badword.txt', 'r') as f:
         badwords = utils.stripnewlines(f.readlines())
 
+
 def reply_hook(message):
     bad_re = list(imap(lambda x: re.compile(re.escape(x), re.I), badwords))
     for word in bad_re:
@@ -29,6 +31,7 @@ def reply_hook(message):
     return message
 
 bot.set_reply_hook(reply_hook)
+
 
 @bot.command
 def addbadword(context):
@@ -44,9 +47,10 @@ def addbadword(context):
     save_badwords()
     if len(removed) > 0:
         bot.reply('Removed \x02%d\x02 redundant badwords: \x02%s\x02' % (len(removed), '\x02, \x02'.join(removed)),
-            context.line, False, True, context.line['user'], nofilter = True)
+            context.line, False, True, context.line['user'], nofilter=True)
     bot.log(context, ('BADWORD', 'ADD'), context.args)
     return 'Added.'
+
 
 @bot.command
 def delbadword(context):
@@ -60,6 +64,7 @@ def delbadword(context):
     bot.log(context, ('BADWORD', 'DEL'), context.args)
     return 'Removed \x02%d\x02 badwords.' % (old - len(badwords))
 
+
 @bot.command
 def listbadwords(context):
     '''.listbadwords'''
@@ -68,8 +73,8 @@ def listbadwords(context):
         return
     word_list = list(badwords)
     if len(word_list) == 0:
-        bot.reply('Nothing to list.', context.line, False, True, context.line['user'], nofilter = True)
+        bot.reply('Nothing to list.', context.line, False, True, context.line['user'], nofilter=True)
     next, word_list = word_list[:4], word_list[4:]
     while next:
-        bot.reply('\x02%s\x02' % '\x02, \x02'.join(next), context.line, False, True, context.line['user'], nofilter = True)
+        bot.reply('\x02%s\x02' % '\x02, \x02'.join(next), context.line, False, True, context.line['user'], nofilter=True)
         next, word_list = word_list[:4], word_list[4:]

@@ -2,6 +2,7 @@ from RedditBot import bot
 
 from random import seed, randint
 
+
 @bot.regex('^!squatlylist')
 def squatlylist(context):
     return 'squatly list: squatly'
@@ -15,6 +16,7 @@ def reset():
     global target
     seed()
     target = randint(3, 5)
+
 
 @bot.regex('.*')
 def counting(context):

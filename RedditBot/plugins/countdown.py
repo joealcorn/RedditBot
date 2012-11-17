@@ -42,11 +42,11 @@ class ResolveExpr(NodeVisitor):
 
     def __init__(self, allowed_numbers=None):
         super(ResolveExpr, self).__init__()
-        if allowed_numbers != None:
+        if allowed_numbers is not None:
             self.allowed_numbers = [Fraction(n) for n in allowed_numbers]
 
     def use_number(self, n):
-        if self.allowed_numbers != None:
+        if self.allowed_numbers is not None:
             if n not in self.allowed_numbers:
                 raise IllegalNumber(n)
             self.allowed_numbers.remove(n)

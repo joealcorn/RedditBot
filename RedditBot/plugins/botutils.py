@@ -95,7 +95,7 @@ def ignore(context):
         bot.config['IGNORE'].append(context.args)
 
         save_ignores()
-        
+
         bot.log(context, ('IGNORE'), '+{0}{1}'.format(context.args, (' -' + ' -'.join(removed)) if removed else ''))
 
         if removed:
@@ -119,11 +119,11 @@ def unignore(context):
         subsets = list(ifilter(filter, bot.config['IGNORE']))
         if len(subsets) == 0:
             return 'Nothing to unignore.'
-        
+
         bot.config['IGNORE'] = list(ifilterfalse(filter, bot.config['IGNORE']))
-        
+
         bot.log(context, ('IGNORE'), '-{0}'.format(' -'.join(subsets)))
-        
+
         save_ignores()
 
         return 'Removed \x02%d\x02 ignores: \x02%s\x02' % (len(subsets), '\x02, \x02'.join(subsets))
