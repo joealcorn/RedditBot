@@ -65,7 +65,7 @@ def youtube_url(context):
 @bot.command('y')
 @bot.command
 def youtube(context):
-    '.youtube <query>'
+    '''.youtube <query>'''
 
     r = requests.get(search_api_url, params=dict(q=context.args))
 
