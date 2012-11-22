@@ -113,6 +113,7 @@ def link(context):
 
 @bot.command('source')
 def reddit_source(context):
+    '''Usage: .source <[url]>'''
     if not context.args and not last_link:
         return
     elif not context.args:
