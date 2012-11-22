@@ -14,6 +14,7 @@ letters_re = re.compile(r'^(?:\w \| )+\w$')
 @bot.command('wa')
 @bot.command('wolframalpha')
 def wa_api(context):
+    '''Usage: .wa <query>'''
     if not bot.config['WOLFRAMALPHA_KEY']:
         return 'WolframAlpha support not configured.'
     url = 'http://api.wolframalpha.com/v2/query'
