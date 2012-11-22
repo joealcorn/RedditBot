@@ -1,82 +1,87 @@
-# ported from kaa, which was ported from skybot
+from RedditBot import bot, utils
 
-from RedditBot import bot
-
+from collections import OrderedDict
+from copy import copy
 import re
-import json
-import time
-import locale
 
-import requests
 
 youtube_re = (r'(?:youtube.*?(?:v=|/v/)|youtu\.be/|yooouuutuuube.*?id=)'
               '([-_a-z0-9]+)',
               re.I)
 youtube_re = re.compile(*youtube_re)
 
-base_url = 'http://gdata.youtube.com/feeds/api/'
-url = base_url + 'videos/{0}?v=2&alt=jsonc'
-search_api_url = base_url + 'videos?v=2&alt=jsonc&max-results=1'
-video_url = "http://youtu.be/{0}"
+video_url = 'https://gdata.youtube.com/feeds/api/videos/{id}'
+search_url = 'https://gdata.youtube.com/feeds/api/videos/'
+
+api_params = {'v': 2, 'alt': 'jsonc'}
 
 
-def get_video_description(vid_id):
-    r = requests.get(url.format(vid_id))
-    data = json.loads(r.content)
+def get_video_information(vid_id, json=None):
+    if json is None:
+        r = utils.make_request(video_url.format(id=vid_id), params=api_params)
+        if isinstance(r, str):
+            return r
+        else:
+            if r.json.get('error'):
+                return 'Error performing search ({0})'.format(r.json['error']['message'])
 
-    if data.get('error'):
-        return
+            data = r.json['data']
+    else:
+        data = json['data']['items'][0]
 
-    data = data['data']
-    data['title'] = data['title'].encode('utf-8', 'replace')
+    length = OrderedDict()
+    duration = data.get('duration', 0)
 
-    out = '\'{title}\''.format(**data)
+    if duration / 3600:
+        # > 1 hour
+        length['hours'] = '{0}h'.format(duration / 3600)
+    if duration / 60:
+        # > 1 minute
+        length['minutes'] = '{0}m'.format(duration / 60 % 60)
+    length['seconds'] = '{0}s'.format(duration % 60)
 
-    if not data.get('duration'):
-        return out
+    information = {
+        'title': data['title'],
+        'length': ' '.join(x[1] for x in length.items()),
+        'views': data.get('viewCount'),
+        'author': data.get('uploader'),
+        'nsfw': '[NSFW] - ' if data.get('contentRating', False) else ''
+    }
 
-    out += ' - '
-    length = data['duration']
-    if length / 3600:  # > 1 hour
-        out += '{0}h '.format(length / 3600)
-    if length / 60:
-        out += '{0}m '.format(length / 60 % 60)
-    out += '{0}s'.format(length % 60)
-
-    # The use of str.decode() prevents UnicodeDecodeError with some locales
-    # See http://stackoverflow.com/questions/4082645/
-    if 'viewCount' in data:
-        out += ' - {0:,d} views'.format(data['viewCount'])
-
-    out += ' - by {0}'.format(data['uploader'])
-
-    if 'contentRating' in data:
-        out = '[NSFW] - ' + out
-
-    return out
+    line = u"{nsfw}'{title}' - {length} - {views:,d} views - by {author}"
+    return line.format(**information)
 
 
 @bot.regex(youtube_re)
 def youtube_url(context):
     vid_id = context.line['regex_search'].groups()[0]
-    return unicode(get_video_description(vid_id), 'utf8')
+    return get_video_information(vid_id)
 
 
 @bot.command('y')
 @bot.command
 def youtube(context):
-    '''.youtube <query>'''
+    '''Usage: .youtube <query>'''
 
-    r = requests.get(search_api_url, params=dict(q=context.args))
+    params = copy(api_params)
+    params.update({
+        'max-results': 1,
+        'q': context.args
+    })
 
-    data = json.loads(r.content)
+    r = utils.make_request(search_url, params=params)
 
-    if 'error' in data:
-        return 'error performing search'
+    if isinstance(r, str):
+        return r
+    elif 'error' in r.json:
+        return 'Error performing search ({0})'.format(r.json['error']['message'])
 
-    if data['data']['totalItems'] == 0:
-        return 'no results found'
+    if r.json == 0:
+        return 'No results found'
 
-    vid_id = data['data']['items'][0]['id']
+    vid_id = r.json['data']['items'][0]['id']
 
-    return unicode(get_video_description(vid_id) + ' - ' + video_url.format(vid_id), 'utf8')
+    return u'{info} - http://youtu.be/{id}'.format(
+        info=get_video_information(vid_id, r.json),
+        id=vid_id
+    )
