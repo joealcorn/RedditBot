@@ -2,7 +2,7 @@ from RedditBot import bot, utils
 
 import re
 
-tweet_re = re.compile('https?://(www.)?twitter.com/.+/status/([0-9]{18})')
+tweet_re = re.compile('https?://(?:www.)?twitter.com/.+/status/([0-9]{18})')
 status_url = 'https://api.twitter.com/1/statuses/show/{}.json'
 latest_url = 'http://api.twitter.com/1/statuses/user_timeline.json'
 line = u'@{screen_name}: {tweet}'
@@ -11,7 +11,7 @@ line = u'@{screen_name}: {tweet}'
 @bot.regex(tweet_re)
 def announce_tweet(context):
     ''' Announces tweets as they are posted in the channel '''
-    tweet_id = context.line['regex_search'].group(2)
+    tweet_id = context.line['regex_search'].group(1)
     url = status_url.format(tweet_id)
     response = utils.make_request(url)
     if not isinstance(response.json, dict):
