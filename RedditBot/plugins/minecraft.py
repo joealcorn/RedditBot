@@ -18,9 +18,10 @@ isup_re = re.compile(r'is (\w+) (?:up|down)', re.I)
 server_re = re.compile(r'^\s*([A-Za-z0-9_-]+\.[A-Za-z0-9_.-]+)(?::([0-9]{1,5}))?\s*$')
 
 nerd_nu = [
- ('c.nerd.nu', 25565, ['creative', 'c']),
- ('p.nerd.nu', 25565, ['pve', 'p']),
- ('s.nerd.nu', 25565, ['survival', 's'])
+ ('c.nerd.nu', 25565, ['c', 'creative']),
+ ('p.nerd.nu', 25565, ['p', 'pve']),
+ ('s.nerd.nu', 25565, ['s', 'survival', 'pvp']),
+ ('event.nerd.nu', 25565, ['e', 'event', 'ctf'])
 ]
 
 
@@ -141,7 +142,11 @@ def status(context):
     def mcb_info():
         up = mcb_status()['success']
         return 'MCBouncer: {}'.format('Up!' if up else 'Down')
-    servers = [server_info(s[0], s[1]) for s in nerd_nu]
+    
+    def is_enabled(s):
+        return any(name in bot.config['ENABLED_SERVERS'].split(',') for name in s[2])
+    
+    servers = [server_info(s[0], s[1]) for s in nerd_nu if is_enabled(s)]
     if bot.config.get('MCBOUNCER_KEY', False):
         servers.append(mcb_info())
     return ' | '.join(servers)
