@@ -2,7 +2,7 @@ from RedditBot import bot, utils
 
 import re
 
-tweet_re = re.compile('https?://(?:www.)?twitter.com/.+/status/([0-9]{18})')
+tweet_re = re.compile('https?://(?:www.)?twitter.com/.+/status(?:es)?/([0-9]{18})')
 status_url = 'https://api.twitter.com/1/statuses/show/{}.json'
 latest_url = 'http://api.twitter.com/1/statuses/user_timeline.json'
 line = u'@{screen_name}: {tweet}'
