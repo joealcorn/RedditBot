@@ -40,7 +40,7 @@ def get_users():
 
 
 def make_date_string(date):
-    if date.day != datetime.utcnow().day:
+    if date.date() != datetime.utcnow().date():
         return date.strftime('%d %b %H:%M')
     else:
         return date.strftime('%H:%M')
