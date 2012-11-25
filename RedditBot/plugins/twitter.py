@@ -13,12 +13,23 @@ def announce_tweet(context):
     ''' Announces tweets as they are posted in the channel '''
     tweet_id = context.line['regex_search'].group(1)
     url = status_url.format(tweet_id)
-    response = utils.make_request(url)
-    if not isinstance(response.json, dict):
+    response = utils.make_request(url, params={'include_entities': 1})
+    if isinstance(response, str):
         return response
 
-    info = {'screen_name': response.json['user']['screen_name'],
-            'tweet': response.json['text']}
+    tweet = response.json['text']
+
+    if 'entities' in response.json:
+        if 'urls' in response.json['entities']:
+            for url in response.json['entities']['urls']:
+                replacement = url['expanded_url']
+                if len(replacement) <= int(bot.config['TWITTER_UNSHORTEN_LIMIT']) or 0:
+                    tweet = tweet.replace(url['url'], replacement)
+
+    info = {
+        'screen_name': response.json['user']['screen_name'],
+        'tweet': tweet
+    }
     if info['screen_name'].lower() in bot.config['TWITTER_BLACKLIST']:
         return
     return utils.unescape_html(line.format(**info))
@@ -33,7 +44,12 @@ def twitter(context):
     elif username.lower().lstrip('@') in bot.config['TWITTER_BLACKLIST']:
         return 'No.'
 
-    params = {'screen_name': username, 'count': 1}
+    params = {
+        'screen_name': username,
+        'count': 1,
+        'include_entities': 1
+    }
+
     response = utils.make_request(latest_url, params)
     if isinstance(response, str):
         return response
@@ -42,6 +58,17 @@ def twitter(context):
     elif response.json == []:
         return 'That user hasn\'t tweeted yet'
 
-    info = {'screen_name': response.json[0]['user']['screen_name'],
-            'tweet': response.json[0]['text']}
+    tweet = response.json[0]['text']
+
+    if 'entities' in response.json[0]:
+        if 'urls' in response.json[0]['entities']:
+            for url in response.json[0]['entities']['urls']:
+                replacement = url['expanded_url']
+                if len(replacement) <= int(bot.config['TWITTER_UNSHORTEN_LIMIT']) or 0:
+                    tweet = tweet.replace(url['url'], replacement)
+
+    info = {
+        'screen_name': response.json[0]['user']['screen_name'],
+        'tweet': tweet
+    }
     return utils.unescape_html(line.format(**info))

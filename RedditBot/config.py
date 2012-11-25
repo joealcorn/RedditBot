@@ -29,6 +29,8 @@ class Config(object):
     COUNTDOWN_CHANNELS = ['#countdown']
     SNOOP_CHANNEL = ''
 
+    TWITTER_UNSHORTEN_LIMIT = 45
+
     LASTFM_API_KEY = ''
     MCBOUNCER_KEY = ''
     WOLFRAMALPHA_KEY = ''
