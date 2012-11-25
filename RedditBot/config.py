@@ -38,6 +38,8 @@ class Config(object):
 
     MINECRAFT_USER = ''
     MINECRAFT_PASSWORD = ''
+    
+    ENABLED_SERVERS = 'c,p,s'
 
     BITLY_KEY = ''
     BITLY_USER = ''
