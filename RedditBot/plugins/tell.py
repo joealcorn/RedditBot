@@ -2,7 +2,7 @@ from RedditBot import bot
 from RedditBot.utils import generate_insult
 from RedditBot.pastebin import paste
 
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, asc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
@@ -88,7 +88,7 @@ def tell_user(context):
         return
 
     session = Session()
-    messages = session.query(tells).filter_by(user_to=nick.lower()).all()
+    messages = session.query(tells).order_by(asc(tells.time)).filter_by(user_to=nick.lower()).all()
 
     if not messages:
         Session.remove()
