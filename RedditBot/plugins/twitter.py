@@ -8,6 +8,29 @@ latest_url = 'http://api.twitter.com/1/statuses/user_timeline.json'
 line = u'@{screen_name}: {tweet}'
 
 
+def extract_info(json):
+    info = {
+        'screen_name': json['user']['screen_name'],
+        'tweet': json['text']
+    }
+
+    if 'entities' in json:
+        if 'urls' in json['entities']:
+            for url in json['entities']['urls']:
+                replacement = url['expanded_url']
+                if len(replacement) <= int(bot.config['TWITTER_UNSHORTEN_LIMIT']) or 0:
+                    info['tweet'] = info['tweet'].replace(url['url'], replacement)
+
+        if 'media' in json['entities']:
+            for thing in json['entities']['media']:
+                if thing['type'] == 'photo':
+                    img_url = 'http://' + thing['display_url']
+                    if len(img_url) <= int(bot.config['TWITTER_UNSHORTEN_LIMIT']):
+                        info['tweet'] = info['tweet'].replace(thing['url'], img_url)
+
+    return info
+
+
 @bot.regex(tweet_re)
 def announce_tweet(context):
     ''' Announces tweets as they are posted in the channel '''
@@ -17,37 +40,20 @@ def announce_tweet(context):
     if isinstance(response, str):
         return response
 
-    tweet = response.json['text']
+    tweet = extract_info(response.json)
 
-    if 'entities' in response.json:
-        if 'urls' in response.json['entities']:
-            for url in response.json['entities']['urls']:
-                replacement = url['expanded_url']
-                if len(replacement) <= int(bot.config['TWITTER_UNSHORTEN_LIMIT']) or 0:
-                    tweet = tweet.replace(url['url'], replacement)
-
-        if 'media' in response.json['entities']:
-            for thing in response.json['entities']['media']:
-                if thing['type'] == 'photo':
-                    img_url = 'http://' + thing['display_url']
-                    if len(img_url) <= int(bot.config['TWITTER_UNSHORTEN_LIMIT']):
-                        tweet = tweet.replace(thing['url'], img_url)
-
-    info = {
-        'screen_name': response.json['user']['screen_name'],
-        'tweet': tweet
-    }
-    if info['screen_name'].lower() in bot.config['TWITTER_BLACKLIST']:
+    if tweet['screen_name'].lower() in bot.config['TWITTER_BLACKLIST']:
         return
-    return utils.unescape_html(line.format(**info))
+
+    return utils.unescape_html(line.format(**tweet))
 
 
 @bot.command
 def twitter(context):
     '''Usage: .twitter <username>'''
     username = context.args.strip().split(' ')[0]
-    if username is '':
-        return 'Usage: .twitter <username>'
+    if username in ('', None):
+        return twitter.__doc__
     elif username.lower().lstrip('@') in bot.config['TWITTER_BLACKLIST']:
         return 'No.'
 
@@ -65,24 +71,6 @@ def twitter(context):
     elif response.json == []:
         return 'That user hasn\'t tweeted yet'
 
-    tweet = response.json[0]['text']
+    tweet = extract_info(response.json[0])
 
-    if 'entities' in response.json[0]:
-        if 'urls' in response.json[0]['entities']:
-            for url in response.json[0]['entities']['urls']:
-                replacement = url['expanded_url']
-                if len(replacement) <= int(bot.config['TWITTER_UNSHORTEN_LIMIT']) or 0:
-                    tweet = tweet.replace(url['url'], replacement)
-
-        if 'media' in response.json[0]['entities']:
-            for thing in response.json[0]['entities']['media']:
-                if thing['type'] == 'photo':
-                    img_url = 'http://' + thing['display_url']
-                    if len(img_url) <= int(bot.config['TWITTER_UNSHORTEN_LIMIT']):
-                        tweet = tweet.replace(thing['url'], img_url)
-
-    info = {
-        'screen_name': response.json[0]['user']['screen_name'],
-        'tweet': tweet
-    }
-    return utils.unescape_html(line.format(**info))
+    return utils.unescape_html(line.format(**tweet))
