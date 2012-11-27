@@ -26,6 +26,13 @@ def announce_tweet(context):
                 if len(replacement) <= int(bot.config['TWITTER_UNSHORTEN_LIMIT']) or 0:
                     tweet = tweet.replace(url['url'], replacement)
 
+        if 'media' in response.json['entities']:
+            for thing in response.json['entities']['media']:
+                if thing['type'] == 'photo':
+                    img_url = 'http://' + thing['display_url']
+                    if len(img_url) <= int(bot.config['TWITTER_UNSHORTEN_LIMIT']):
+                        tweet = tweet.replace(thing['url'], img_url)
+
     info = {
         'screen_name': response.json['user']['screen_name'],
         'tweet': tweet
@@ -66,6 +73,13 @@ def twitter(context):
                 replacement = url['expanded_url']
                 if len(replacement) <= int(bot.config['TWITTER_UNSHORTEN_LIMIT']) or 0:
                     tweet = tweet.replace(url['url'], replacement)
+
+        if 'media' in response.json[0]['entities']:
+            for thing in response.json[0]['entities']['media']:
+                if thing['type'] == 'photo':
+                    img_url = 'http://' + thing['display_url']
+                    if len(img_url) <= int(bot.config['TWITTER_UNSHORTEN_LIMIT']):
+                        tweet = tweet.replace(thing['url'], img_url)
 
     info = {
         'screen_name': response.json[0]['user']['screen_name'],
