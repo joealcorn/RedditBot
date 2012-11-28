@@ -50,8 +50,9 @@ class PluginHandler(irctk.plugins.PluginHandler):
                 full = ''.join(traceback.format_exception(*sys.exc_info()))
                 baby = ''.join(traceback.format_tb(sys.exc_info()[2], 1)).split('\n')
 
-                if self.config['DEBUG'] or not self.config['SNOOP_CHANNEL']:
-                    sys.stderr.write(full)
+                sys.stderr.write(full)
+
+                if not self.config['SNOOP_CHANNEL']:
                     return
 
                 try:
