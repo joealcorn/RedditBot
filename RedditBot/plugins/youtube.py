@@ -43,7 +43,7 @@ def get_video_information(vid_id, json=None):
     information = {
         'title': data['title'],
         'length': ' '.join(x[1] for x in length.items()),
-        'views': data.get('viewCount'),
+        'views': data.get('viewCount', 0),
         'author': data.get('uploader'),
         'nsfw': '[NSFW] - ' if data.get('contentRating', False) else ''
     }
