@@ -10,7 +10,7 @@ class Config(object):
     REALNAME = 'https://github.com/buttscicles/RedditBot'
     CHANNELS = ['#RedditMC', '#countdown']
 
-    ADMINS = ['*!*@AlcoJew.staff.reddit-minecraft',
+    ADMINS = ['*!joe@*.buttscicl.es',
               '*!joe@buttscicl.es',
               '*!edk141@edk141.co.uk',
               '*!*@edk141.staff.reddit-minecraft']
@@ -38,7 +38,7 @@ class Config(object):
 
     MINECRAFT_USER = ''
     MINECRAFT_PASSWORD = ''
-    
+
     ENABLED_SERVERS = 'c,p,s'
 
     BITLY_KEY = ''
