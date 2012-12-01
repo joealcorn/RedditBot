@@ -131,6 +131,7 @@ def minecraft_status(context):
 
 
 @bot.command
+@utils.cooldown(bot)
 def status(context):
     '''Usage: .status'''
     def server_info(host, port):
