@@ -161,6 +161,7 @@ def status(context):
 
 
 @bot.regex(isup_re)
+@utils.cooldown(bot)
 def is_x_up(context):
     server = find_server(context.line['regex_search'].group(1))
     if not server:
@@ -179,6 +180,7 @@ def is_x_up(context):
 
 
 @bot.command
+@utils.cooldown(bot)
 def isup(context):
     '''Usage: .isup <MC server address>'''
     server = find_server(context.args)

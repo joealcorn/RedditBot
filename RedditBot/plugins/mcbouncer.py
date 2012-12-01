@@ -23,6 +23,7 @@ def mcb_status():
 
 @bot.command('mcb')
 @bot.command
+@utils.cooldown(bot)
 def mcbouncer(context):
     '''Usage: .mcb'''
     return mcb_status()['message']
