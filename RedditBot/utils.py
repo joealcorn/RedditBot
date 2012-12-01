@@ -1,8 +1,11 @@
-
 from RedditBot.ircglob import glob
+
 from itertools import imap, ifilter
 from HTMLParser import HTMLParser
+from functools import wraps
+from time import time
 import random
+
 import requests
 
 headers = {'User-Agent': 'irc.gamesurge.net #redditmc/RedditBot'}
@@ -65,6 +68,43 @@ def shorten_url(bot, url):
 
 def unescape_html(string):
     return HTMLParser().unescape(string)
+
+
+def cooldown(bot):
+    '''
+    Prevents commands being used multiple times in a certain time period
+    Set module.function.cooldown to an int to set the cooldown period
+
+    '''
+    def decoration(func):
+        @wraps(func)
+        def wrapper(context):
+
+            cfg = '{0}.{1}.cooldown'.format(func.__module__, func.__name__).lower()
+            ts = '{0}.{1}.timestamp'.format(func.__module__, func.__name__).lower()
+            ct = int(time())
+
+            # func.__module__ changes after reloading, work around that
+            if cfg.startswith('redditbot.plugins'):
+                cfg = cfg[18:]
+            if ts.startswith('redditbot.plugins'):
+                ts = ts[18:]
+
+            if ts in bot.data and cfg in bot.config and not isadmin(context.line['prefix'], bot):
+                last_used = ct - bot.data[ts]
+                period = int(bot.config[cfg])
+
+                if last_used < period:
+                    bot.reply('That has been already been used within the last {0} seconds'.format(period),
+                    context.line, False, True, context.line['user'], nofilter=True)
+                    return
+
+            bot.data[ts] = ct
+
+            return func(context)
+        return wrapper
+
+    return decoration
 
 
 ### begin insult code, shamelessly stolen from rbot
