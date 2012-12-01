@@ -4,8 +4,6 @@ from RedditBot import bot, utils
 from RedditBot.plugins.mcbouncer import mcb_status
 from RedditBot.plugins import mumble
 
-#from itertools import imap
-
 import socket
 import re
 
