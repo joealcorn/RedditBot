@@ -34,11 +34,11 @@ bot.set_reply_hook(reply_hook)
 
 
 @bot.command
+@utils.require_admin(bot)
 def addbadword(context):
     '''.addbadword <word>'''
     global badwords
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
+
     if any(imap(lambda word: word in context.args.lower(), badwords)):
         return 'This would be redundant, not adding.'
     removed = list(ifilter(lambda word: context.args.lower() in word, badwords))
@@ -53,11 +53,11 @@ def addbadword(context):
 
 
 @bot.command
+@utils.require_admin(bot)
 def delbadword(context):
     '''.delbadword <word>'''
     global badwords
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
+
     old = len(badwords)
     badwords = list(ifilter(lambda word: word != context.args.lower(), badwords))
     save_badwords()
@@ -66,11 +66,11 @@ def delbadword(context):
 
 
 @bot.command
+@utils.require_admin(bot)
 def listbadwords(context):
     '''.listbadwords'''
     global badwords
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
+
     word_list = list(badwords)
     if len(word_list) == 0:
         bot.reply('Nothing to list.', context.line, False, True, context.line['user'], nofilter=True)

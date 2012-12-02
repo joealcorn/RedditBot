@@ -51,10 +51,9 @@ def usage(context):
 
 
 @bot.command
+@utils.require_admin(bot)
 def raw(context):
     '''.raw <command>'''
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
     if context.args:
         command = context.args.split(' ', 1)[0]
         args = list(context.args.split(' ', 1)[-1])
@@ -65,10 +64,9 @@ def raw(context):
 
 
 @bot.command
+@utils.require_admin(bot)
 def inject(context):
     '''.inject <input_data>'''
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
     if context.args:
         bot.log(context, ('INJECT'), context.args)
         bot.inject_input(context.args)
@@ -77,11 +75,11 @@ def inject(context):
 
 
 @bot.command
+@utils.require_admin(bot)
 def ignore(context):
     '''.ignore nick!user@host'''
     bot.config.setdefault('IGNORE', [])
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
+
     if context.args:
         to_ignore = glob(context.args)
         supersets = list(ifilter(lambda ignored: to_ignore.issub(glob(ignored)), bot.config['IGNORE']))
@@ -107,11 +105,11 @@ def ignore(context):
 
 
 @bot.command
+@utils.require_admin(bot)
 def unignore(context):
     '''.unignore nick!user@host'''
     bot.config.setdefault('IGNORE', [])
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
+
     if context.args:
         to_unignore = glob(context.args)
 
@@ -132,10 +130,10 @@ def unignore(context):
 
 
 @bot.command
+@utils.require_admin(bot)
 def listignores(context):
     '''.listignores'''
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
+
     word_list = bot.config.setdefault('IGNORE', [])
     if len(word_list) == 0:
         bot.reply('Nothing to list.', context.line, False, True, context.line['user'], nofilter=True)
@@ -146,10 +144,10 @@ def listignores(context):
 
 
 @bot.command
+@utils.require_admin(bot)
 def uptime(context):
     '''Usage: .uptime'''
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
+
     line = ''
     try:
         with open('/proc/uptime') as h:

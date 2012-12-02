@@ -5,10 +5,10 @@ import __builtin__
 
 
 @bot.command
+@utils.require_admin(bot)
 def eval(context):
     '''.eval <command>'''
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
+
     if context.args:
         try:
             bot.log(context, ('EVAL'), context.args)

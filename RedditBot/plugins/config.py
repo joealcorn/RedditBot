@@ -8,10 +8,10 @@ blacklist = ['REGEX', 'IGNORE', 'EVENTS', 'PLUGINS', 'START_TIME']
 
 
 @bot.command
+@utils.require_admin(bot)
 def config(context):
     '''.config (list|view|set|add|remove|revert) <key> [value]'''
-    if not utils.isadmin(context.line['prefix'], bot):
-        return
+
     cmd = str(context.args).split(' ', 1)[0].lower()
     if not (cmd in ['list', 'set', 'add', 'remove', 'view', 'revert']):
         return
