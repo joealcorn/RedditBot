@@ -96,7 +96,7 @@ def cooldown(bot):
 
                 if last_used < period:
                     bot.reply('That has been already been used within the last {0} seconds'.format(period),
-                    context.line, False, True, context.line['user'], nofilter=True)
+                              context.line, False, True, context.line['user'], nofilter=True)
                     return
 
             bot.data[ts] = ct
