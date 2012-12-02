@@ -107,6 +107,27 @@ def cooldown(bot):
     return decoration
 
 
+def require_admin(bot, message='That command can only be run by admins', notice=True):
+    '''
+    Decorator for commands that can only be run by an admin
+
+    '''
+    def decoration(func):
+        @wraps(func)
+        def wrapper(context):
+            if not isadmin(context.line['prefix'], bot):
+                if notice:
+                    bot.reply(message, context.line, False, True, context.line['user'], nofilter=True)
+                    return
+                else:
+                    return message
+
+            else:
+                return func(context)
+        return wrapper
+    return decoration
+
+
 ### begin insult code, shamelessly stolen from rbot
 
 adj = [
