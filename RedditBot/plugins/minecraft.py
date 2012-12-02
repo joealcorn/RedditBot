@@ -114,6 +114,7 @@ def manual_session():
 
 @bot.command('login')
 @bot.command('session')
+@utils.cooldown(bot)
 def minecraft_status(context):
     '''Usage: .session'''
     r = utils.make_request('http://status.mojang.com/check')
