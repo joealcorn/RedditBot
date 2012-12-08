@@ -20,6 +20,7 @@ nerd_nu = [
  ('c.nerd.nu', 25565, ['c', 'creative']),
  ('p.nerd.nu', 25565, ['p', 'pve']),
  ('s.nerd.nu', 25565, ['s', 'survival', 'pvp']),
+ ('chaos.nerd.nu', 25565, ['x', 'chaos']),
  ('event.nerd.nu', 25565, ['e', 'event', 'ctf']),
  ('mumble.nerd.nu', 6162, ['m', 'mumble', 'voice'])
 ]
