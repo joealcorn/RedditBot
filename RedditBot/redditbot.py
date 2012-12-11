@@ -57,9 +57,10 @@ class PluginHandler(irctk.plugins.PluginHandler):
 
                 try:
                     p = paste(full, title='Internal {0}'.format(etype.__name__), unlisted=1, language='pytraceback')
-                    if 'url' in p:
+                    if p['success']:
                         self.bot.log((plg, 'EXCEPTION'), etype.__name__, p['url'])
                     else:
+                        self.bot.log((plg, 'EXCEPTION', 'PASTE_FAILED'), p['error'])
                         raise Exception()
                 except:
                     self.bot.log((plg, 'EXCEPTION', 'PASTE_FAILED'), etype.__name__, baby)
