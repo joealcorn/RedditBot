@@ -128,7 +128,7 @@ def minecraft_status(context):
         response['session'] = manual_session()
         response['login'] = manual_login()
 
-    line = '[Login] {login} [Session] {session}'.format(**response)
+    line = '[Login] {login} [Session] {session} [Account] {account}'.format(**response)
     return line
 
 
