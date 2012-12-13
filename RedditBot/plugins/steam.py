@@ -2,7 +2,7 @@ from RedditBot import bot, utils
 from bs4 import BeautifulSoup
 
 
-store_re = r'https?://store.steampowered.com/app/(?:\d+)'
+store_re = r'.*(https?://store.steampowered.com/app/(?:\d+))'
 store_line = u'{title} on Steam - {price}'
 
 title_attrs = {'class': 'apphub_AppName'}
@@ -18,7 +18,7 @@ agecheck_params = {
 
 @bot.regex(store_re)
 def store(context):
-    url = context.line['regex_search'].string
+    url = context.line['regex_search'].group(1)
     r = utils.make_request(url)
     if isinstance(r, str):
         return r
