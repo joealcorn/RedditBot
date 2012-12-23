@@ -8,6 +8,7 @@ store_line = u'{title} on Steam - {price}'
 title_attrs = {'class': 'apphub_AppName'}
 price_attrs = {'itemprop': 'price'}
 
+steam_params = {'cc': 'uk'}
 agecheck_params = {
     'snr': '1_agecheck_agecheck__age-gate',
     'ageDay': '1',
@@ -19,7 +20,7 @@ agecheck_params = {
 @bot.regex(store_re)
 def store(context):
     url = context.line['regex_search'].group(1)
-    r = utils.make_request(url)
+    r = utils.make_request(url, params=steam_params)
     if isinstance(r, str):
         return r
     elif len(r.history) > 0:
