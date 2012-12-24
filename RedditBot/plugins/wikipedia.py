@@ -2,16 +2,17 @@
 
 from RedditBot import bot
 
-from urllib import quote
-
 import xml.etree.ElementTree as etree
-
+from urllib import quote, unquote
 import re
 
 import requests
 
-api_prefix = 'http://en.wikipedia.org/w/api.php'
-search_url = api_prefix + '?action=opensearch&format=xml'
+search_url = 'http://en.wikipedia.org/w/api.php'
+search_params = {
+    'action': 'opensearch',
+    'format': 'xml'
+}
 
 paren_re = re.compile('\s*\(.*\)$')
 
@@ -20,7 +21,13 @@ wiki_re = re.compile('(\http|\https)(\://*.[a-zA-Z]{0,1}\.*wikipedia.+?)'
 
 
 def wiki_search(query):
-    r = requests.get(search_url, params=dict(search=query))
+    result = {
+        'description': None,
+        'url': None
+    }
+
+    search_params.update({'search': unquote(query)})
+    r = requests.get(search_url, params=search_params)
     data = etree.fromstring(r.content)
 
     ns = '{http://opensearch.org/searchsuggest2}'
@@ -28,9 +35,10 @@ def wiki_search(query):
 
     if items == []:
         if data.find('error') is not None:
-            return 'error: {code}: {info}'.format(data.find('error').attrib)
+            result['description'] = 'Error: {code}: {info}'.format(data.find('error').attrib)
         else:
-            return 'no results found'
+            result['description'] = 'No results found'
+        return result
 
     def extract(item):
         return [item.find(ns + e).text for e in ('Text', 'Description', 'Url')]
@@ -49,20 +57,32 @@ def wiki_search(query):
 
     if len(desc) > 300:
         desc = desc[:300].rsplit(' ', 1)[0] + '...'
-    
-    return desc, url
+
+    result.update({
+        'description': desc,
+        'url': quote(url, ':/')
+    })
+
+    return result
 
 
 @bot.regex(wiki_re)
 def wiki_find(context):
     query = context.line['regex_search'].groups()[-1]
-    desc, _ = wiki_search(query)
-    return desc
+    result = wiki_search(query)
+    print result
+    if result['url'] is None:
+        return None
+    else:
+        return result['description']
 
 
 @bot.command('wp')
 @bot.command
 def wikipedia(context):
     '''.wikipedia <query>'''
-    desc, url = wiki_search(context.args)
-    return u'{0} -- {1}'.format(desc, quote(url, ':/'))
+    result = wiki_search(context.args)
+    if result['url'] is None:
+        return u'{0}'.format(result['description'])
+    else:
+        return u'{0} -- {1}'.format(result['description'], result['url'])
