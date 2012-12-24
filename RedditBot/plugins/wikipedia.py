@@ -15,9 +15,8 @@ search_url = api_prefix + '?action=opensearch&format=xml'
 
 paren_re = re.compile('\s*\(.*\)$')
 
-wiki_re = '(\http|\https)(\://*.[a-zA-Z]{0,1}\.*wikipedia.+?)' \
-     '(\com/wiki/|\org/wiki/)([^\s]+)'
-wiki_re = re.compile(wiki_re)
+wiki_re = re.compile('(\http|\https)(\://*.[a-zA-Z]{0,1}\.*wikipedia.+?)'
+                     '(\com/wiki/|\org/wiki/)(?!File\:)([^\s]+)')
 
 
 def wiki_search(query):
