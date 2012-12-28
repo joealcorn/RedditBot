@@ -5,10 +5,8 @@ from copy import copy
 import re
 
 
-youtube_re = (r'(?:youtube.*?(?:v=|/v/)|youtu\.be/|yooouuutuuube.*?id=)'
-              '([-_a-z0-9]+)',
-              re.I)
-youtube_re = re.compile(*youtube_re)
+youtube_re = re.compile(r'(?:youtube.*?(?:v=|/v/)|youtu\.be/|yooouuutuuube.*?id=)'
+                         '([-_a-z0-9]+)', re.I)
 
 video_url = 'https://gdata.youtube.com/feeds/api/videos/{id}'
 search_url = 'https://gdata.youtube.com/feeds/api/videos/'
