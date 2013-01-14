@@ -8,7 +8,7 @@ import random
 
 import requests
 
-headers = {'User-Agent': 'irc.gamesurge.net #redditmc/RedditBot'}
+headers = {'User-Agent': 'https://github.com/buttscicles/RedditBot/'}
 timeout = 5
 
 
