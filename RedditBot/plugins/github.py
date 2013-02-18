@@ -11,8 +11,8 @@ api_url = 'https://api.github.com/{0}'
 commit_re = re.compile(r'\bhttps?://github\.com/(?P<owner>[\w-]+)/(?P<repo>[\w-]+)/commit/(?P<hash>[A-Fa-f0-9]+)/?(?![/\w])', re.I)
 commit_request = 'repos/{owner}/{repo}/git/commits/{hash}'
 commit_web = 'https://github.com/{owner}/{repo}/commit/{hash}'
-commit_format = '\x02{short_url}\x02 -- {sha:.7} {author[name]} <{author[email]}>: {message}'
-commit_format_pushedBy = '\x02{short_url}\x02 -- {sha:.7} {author[name]} <{author[email]}> (pushed by {committer[name]}): {message}'
+commit_format = '\x02{short_url}\x02 -- {sha:.7} {author[name]}: {message}'
+commit_format_pushedBy = '\x02{short_url}\x02 -- {sha:.7} {author[name]} (pushed by {committer[name]}): {message}'
 
 commitlist_request = 'repos/{owner}/{repo}/commits'
 
