@@ -13,7 +13,8 @@ agecheck_params = {
     'snr': '1_agecheck_agecheck__age-gate',
     'ageDay': '1',
     'ageMonth': 'January',
-    'ageYear': '1970'
+    'ageYear': '1970',
+    'cc': 'uk'
 }
 
 
