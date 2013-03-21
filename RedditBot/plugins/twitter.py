@@ -11,7 +11,7 @@ line = u'@{screen_name}: {tweet}'
 def extract_info(json):
     info = {
         'screen_name': json['user']['screen_name'],
-        'tweet': json['text']
+        'tweet': json['text'].replace('\n', '')
     }
 
     if 'entities' in json:
