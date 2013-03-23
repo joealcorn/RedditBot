@@ -13,17 +13,16 @@ imdb_re = re.compile(
 )
 
 
-@bot.command('test')
-def test(context):
-    return 'testets'
-
-
 @bot.regex(imdb_re)
 def announce_title(context):
     media_id = context.line['regex_search'].group('id')
     r = utils.make_request(base_url, params={'i': media_id})
     if isinstance(r, str):
         return r
+
+    # omdbapi returns Response as a string
+    if r.json['Response'] in ('False', False):
+        return 'Invalid media ID'
 
     info = {
         'title': r.json['Title'],
@@ -38,14 +37,19 @@ def announce_title(context):
 
 @bot.command('imdb')
 def search(context):
+    """Usage: .imdb <title>"""
     query = context.args
 
     r = utils.make_request(base_url, params={'s': query})
     if isinstance(r, str):
         return r
 
+    # ombdapi returns Response = 'False' as a string
+    # instead of bool, and only if the search fails
+    if 'Response' in r.json:
+        return r.json['Error']
+
     result = r.json['Search'][0]
-    print result
 
     info = {
         'title': result['Title'],
