@@ -16,7 +16,7 @@ commit_format_pushedBy = '\x02{short_url}\x02 -- {sha:.7} {author[name]} (pushed
 
 commitlist_request = 'repos/{owner}/{repo}/commits'
 
-gist_re = re.compile(r'\bhttps?://gist\.github\.com/(?P<id>[A-Fa-f0-9]+)\b')
+gist_re = re.compile(r'\bhttps?://gist\.github\.com/[\w-]+/(?P<id>[A-Fa-f0-9]+)\b')
 gist_request = 'gists/{id}'
 gist_format = '\x02{short_url}\x02 -- uploaded by {user[login]}, files: {file_list}, {comments} comments'
 
