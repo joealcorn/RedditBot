@@ -8,7 +8,7 @@ info_line = "'{title}' ({yr}) - {rating}/10 - directed by {director} - {plot}"
 search_line = "'{title}' ({yr}) - http://www.imdb.com/title/{id}/"
 
 imdb_re = re.compile(
-    r'https?://(?:www.)imdb.com/title/(?P<id>[A-Z0-9]+)/',
+    r'https?://(?:www.)imdb.(com|co\.uk)/title/(?P<id>[A-Z0-9]+)/',
     re.I
 )
 
