@@ -61,12 +61,14 @@ def karma(context):
     url = 'http://www.reddit.com/user/{}/about.json'.format(redditor)
     redditor = utils.make_request(url)
     if isinstance(redditor, str):
-        return redditor
+        return '{0}: {1}'.format(context.line['user'], redditor)
     else:
         try:
             redditor = redditor.json['data']
         except:
-            return 'Could not fetch json, does that user exist?'
+            return '{0}: Could not fetch json, does that user exist?'.format(
+                context.line['user']
+            )
 
     info = {
         'redditor': redditor['name'],
@@ -83,12 +85,12 @@ def announce_reddit(context):
     url = 'http://www.reddit.com/comments/{}.json'.format(submission_id)
     submission = utils.make_request(url)
     if isinstance(submission, str):
-        return submission
+        return '{0}: {1}'.format(context.line['user'], submission)
     else:
         try:
             submission = submission.json[0]['data']['children'][0]['data']
         except Exception:
-            return 'Could not fetch json'
+            return '{0}: Could not fetch json'.format(context.line['user'])
 
     if is_blacklisted(submission['subreddit']):
         return  # don't give them the satisfaction!
