@@ -57,7 +57,9 @@ def api_format_commit(info, verbose=False):
     request = commit_request.format(**info)
     r = utils.make_request(api_url.format(request))
     if isinstance(r, str) or is_error(r.json):
-        return verbose and 'GitHub error: {}'.format(r.json['message']) if 'json' in r else r
+        if hasattr(r, 'json'):
+            r = 'Github error: {0}'.format(r.json['message'])
+        return verbose and r
     commit = r.json
     commit['message'] = commit['message'].splitlines()[0].strip()
     commit['short_url'] = gitio_shorten(commit_web.format(**info))
@@ -69,7 +71,9 @@ def api_format_branch(info, verbose=False):
     request = commitlist_request.format(**info)
     r = utils.make_request(api_url.format(request), params={'sha': info['branch']})
     if isinstance(r, str) or is_error(r.json):
-        return verbose and 'GitHub error: {}'.format(r.json['message']) if 'json' in r else r
+        if hasattr(r, 'json'):
+            r = 'Github error: {0}'.format(r.json['message'])
+        return verbose and r
     commit = r.json[0]['commit']
     commit['sha'] = r.json[0]['sha']
     info['hash'] = commit['sha']
@@ -83,7 +87,9 @@ def api_format_gist(info, verbose=False):
     request = gist_request.format(**info)
     r = utils.make_request(api_url.format(request))
     if isinstance(r, str) or is_error(r.json):
-        return verbose and 'GitHub error: {}'.format(r.json['message']) if 'json' in r else r
+        if hasattr(r, 'json'):
+            r = 'Github error: {0}'.format(r.json['message'])
+        return verbose and r
     gist = r.json
     gist['file_list'] = ' '.join(gist['files'].keys())
     gist['short_url'] = gitio_shorten(gist['html_url'])
@@ -94,7 +100,9 @@ def api_format_repo(info, verbose=False):
     request = repo_request.format(**info)
     r = utils.make_request(api_url.format(request))
     if isinstance(r, str) or is_error(r.json):
-        return verbose and 'GitHub error: {}'.format(r.json['message']) if 'json' in r else r
+        if hasattr(r, 'json'):
+            r = 'Github error: {0}'.format(r.json['message'])
+        return verbose and r
     repo = r.json
     repo['description'] = repo['description'].strip()
     repo['short_url'] = gitio_shorten(repo['html_url'])
