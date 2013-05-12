@@ -27,6 +27,8 @@ def reddit(context):
     elif subreddit.lower().endswith(('/new', '/new/')):
         # reddit occasionally returns fuck all if the query string is not added
         params = {'sort': 'new'}
+    elif subreddit.startswith(('r/', '/r/')):
+        subreddit = subreddit.split('r/')[1]
 
     url = 'http://www.reddit.com/r/{}.json'.format(subreddit)
     submission = utils.make_request(url, params)
