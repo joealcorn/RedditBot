@@ -56,7 +56,7 @@ class Tweet(object):
 def extract_info(json):
     info = {
         'screen_name': json['user']['screen_name'],
-        'tweet': json['text'].replace('\n', '')
+        'tweet': json['text'].replace('\n', ' ')
     }
 
     if 'entities' in json:
