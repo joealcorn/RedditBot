@@ -6,7 +6,7 @@ import sys
 
 
 def signal_handler(signal, frame):
-    bot.irc.send_command('QUIT :CTRL+C at Console')
+    bot.irc.send_command('QUIT', ':CTRL+C at Console')
     sleep(1)
     sys.exit(0)
 
