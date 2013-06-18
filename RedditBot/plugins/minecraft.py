@@ -9,20 +9,21 @@ import re
 
 from requests import codes
 
-statuses = {'green': 'Up!', 'red': 'Down'}
-account  = {'true': '{} is a premium Minecaft account',
-            'false': '{} is \x02not\x02 a premium Minecraft account'}
+account = {
+    'true': '{} is a premium Minecaft account',
+    'false': '{} is \x02not\x02 a premium Minecraft account'
+}
 
 isup_re = re.compile(r'is (\w+) (?:up|down)', re.I)
 server_re = re.compile(r'^\s*([A-Za-z0-9_-]+\.[A-Za-z0-9_.-]+)(?::([0-9]{1,5}))?\s*$')
 
 nerd_nu = [
- ('c.nerd.nu', 25565, ['c', 'creative']),
- ('p.nerd.nu', 25565, ['p', 'pve']),
- ('s.nerd.nu', 25565, ['s', 'survival', 'pvp']),
- ('chaos.nerd.nu', 25565, ['x', 'chaos']),
- ('event.nerd.nu', 25565, ['e', 'event', 'ctf']),
- ('mumble.nerd.nu', 6162, ['m', 'mumble', 'voice'])
+    ('c.nerd.nu', 25565, ['c', 'creative']),
+    ('p.nerd.nu', 25565, ['p', 'pve']),
+    ('s.nerd.nu', 25565, ['s', 'survival', 'pvp']),
+    ('chaos.nerd.nu', 25565, ['x', 'chaos']),
+    ('event.nerd.nu', 25565, ['e', 'event', 'ctf']),
+    ('mumble.nerd.nu', 6162, ['m', 'mumble', 'voice'])
 ]
 
 
