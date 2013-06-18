@@ -83,7 +83,7 @@ def silly_label(server):
     return bot.config.get(n, 'players')
 
 
-def manual_login():
+def check_login():
     params = {'user': bot.config['MINECRAFT_USER'],
               'password': bot.config['MINECRAFT_PASSWORD'],
               'version': 9001}
@@ -98,7 +98,7 @@ def manual_login():
             return 'Down ({})'.format(r.status_code)
 
 
-def manual_session():
+def check_session():
     params = {'user': bot.config['MINECRAFT_USER'],
               'sessionId': 'invalid',
               'serverId': 'invalid'}
@@ -118,17 +118,10 @@ def manual_session():
 @utils.cooldown(bot)
 def minecraft_status(context):
     '''Usage: .session'''
-    r = utils.make_request('http://status.mojang.com/check')
-    response = {}
-    try:
-        for i in r.json:
-            for k, v in i.iteritems():
-                response[k.split('.')[0]] = statuses[v]
-    except:
-        response['session'] = manual_session()
-        response['login'] = manual_login()
+    session = check_session()
+    login = check_login()
 
-    line = '[Login] {login} [Session] {session}'.format(**response)
+    line = '[Login] {login} [Session] {session}'.format(login, session)
     return line
 
 
