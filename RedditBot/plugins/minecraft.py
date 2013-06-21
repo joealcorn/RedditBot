@@ -122,7 +122,7 @@ def minecraft_status(context):
     session = check_session()
     login = check_login()
 
-    line = '[Login] {login} [Session] {session}'.format(login, session)
+    line = '[Login] {0} [Session] {1}'.format(login, session)
     return line
 
 
