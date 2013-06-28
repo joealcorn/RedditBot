@@ -57,6 +57,7 @@ def youtube_url(context):
 
 
 @bot.command('y')
+@bot.command('yt')
 @bot.command
 def youtube(context):
     '''Usage: .youtube <query>'''
