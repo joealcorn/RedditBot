@@ -134,7 +134,12 @@ def status(context):
         info = get_info(host, port)
         if not info:
             return '{} seems to be down'.format(host)
-        return '{motd}: [{players}/{max_players}]'.format(**info)
+
+        line = '{motd}: [{players}/{max_players}]'
+        if 'minecraft_version' in info and bot.config.get('MINECRAFT_SHOW_SERVER_VER'):
+            line = line.replace('{motd}', '{motd} ({minecraft_version})')
+
+        return line.format(**info)
 
     def mumble_info():
         up = mumble.get_info('mumble.nerd.nu', 6162)
