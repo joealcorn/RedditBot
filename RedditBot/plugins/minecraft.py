@@ -38,6 +38,8 @@ def get_info(host, port):
         s.send('\xfe')
         #Send a payload of 0x01 to trigger a new response if the server supports it
         s.send('\x01')
+        #Send an additional byte (bungee requires 3)
+        s.send('\xfa')
 
         #Read as much data as we can (max packet size: 241 bytes)
         d = s.recv(256)
