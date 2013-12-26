@@ -43,6 +43,14 @@ class Config(object):
     MINECRAFT_USER = ''
     MINECRAFT_PASSWORD = ''
     MINECRAFT_SHOW_SERVER_VER = False
+    MINECRAFT_SERVER_LIST = [
+        ('c.nerd.nu', 25565, ['c', 'creative']),
+        ('p.nerd.nu', 25565, ['p', 'pve']),
+        ('s.nerd.nu', 25565, ['s', 'survival', 'pvp']),
+        ('chaos.nerd.nu', 25565, ['x', 'chaos']),
+        ('event.nerd.nu', 25565, ['e', 'event', 'ctf']),
+        ('mumble.nerd.nu', 6162, ['m', 'mumble', 'voice'])
+    ]
 
     ENABLED_SERVERS = 'c,p,s'
 

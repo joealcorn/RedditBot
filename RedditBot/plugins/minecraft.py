@@ -19,14 +19,8 @@ account = {
 isup_re = re.compile(r'is (\w+) (?:up|down)', re.I)
 server_re = re.compile(r'^\s*([A-Za-z0-9_-]+\.[A-Za-z0-9_.-]+)(?::([0-9]{1,5}))?\s*$')
 
-serverlist = [
-    ('c.nerd.nu', 25565, ['c', 'creative']),
-    ('p.nerd.nu', 25565, ['p', 'pve']),
-    ('s.nerd.nu', 25565, ['s', 'survival', 'pvp']),
-    ('chaos.nerd.nu', 25565, ['x', 'chaos']),
-    ('event.nerd.nu', 25565, ['e', 'event', 'ctf']),
-    ('mumble.nerd.nu', 6162, ['m', 'mumble', 'voice'])
-]
+serverlist = bot.config.get('MINECRAFT_SERVER_LIST', [])
+
 
 def unpack_varint(s):
     d = 0
@@ -36,6 +30,7 @@ def unpack_varint(s):
         if not b & 0x80:
             break
     return d
+
 
 def pack_varint(d):
     o = ""
@@ -47,11 +42,14 @@ def pack_varint(d):
             break
     return o
 
+
 def pack_data(d):
     return pack_varint(len(d)) + d
 
+
 def pack_port(i):
     return struct.pack('>H', i)
+
 
 def get_info(host='localhost', port=25565):
     try:
