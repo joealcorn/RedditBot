@@ -76,7 +76,7 @@ def get_info(host='localhost', port=25565):
         # Load json and return
         info = json.loads(d.decode('utf8'))
         return {'protocol_version': info['version']['protocol'],
-                'minecraft_version':    info['version']['name'],
+                'minecraft_version':    re.match('.*([0-9]\.[0-9]\.[0-9]).*',info['version']['name']).groups()[0],
                 'motd':                 info['description'],
                 'players':          info['players']['online'],
                 'max_players':      info['players']['max']}
