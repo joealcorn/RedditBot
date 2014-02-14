@@ -6,7 +6,7 @@ import oauth2 as oauth
 
 tweet_re = re.compile('https?://(?:www\.|mobile\.)?twitter.com/.+/status(?:es)?/([0-9]{18})')
 status_url = 'https://api.twitter.com/1.1/statuses/show/{}.json'
-latest_url = 'http://api.twitter.com/1.1/statuses/user_timeline.json'
+latest_url = 'https://api.twitter.com/1.1/statuses/user_timeline.json'
 line = u'@{screen_name}: {tweet}'
 
 
