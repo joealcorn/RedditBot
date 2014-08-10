@@ -56,11 +56,11 @@ def get_info(host='localhost', port=25565):
         # Connect
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((host, port))
-    
+
         # Send handshake + status request
         s.send(pack_data("\x00\x00" + pack_data(host.encode('utf8')) + pack_port(port) + "\x01"))
         s.send(pack_data("\x00"))
-    
+
         # Read response
         unpack_varint(s)     # Packet length
         unpack_varint(s)     # Packet ID
@@ -69,10 +69,10 @@ def get_info(host='localhost', port=25565):
         d = ""
         while len(d) < l:
             d += s.recv(1024)
-    
+
         # Close our socket
         s.close()
-    
+
         # Load json and return
         info = json.loads(d.decode('utf8'))
         return {'protocol_version': info['version']['protocol'],
@@ -189,7 +189,7 @@ def is_x_up(context):
 
     info = get_info(server[0], server[1])
     if info:
-        return '{0} is online with {players}/{max_players} {1} online.'.format(server[0], silly_label(server), **info)
+        return '{0} is online with {players}/{max_players} {1} connected.'.format(server[0], silly_label(server), **info)
     else:
         return '{0} seems to be down :(.'.format(server[0])
 
