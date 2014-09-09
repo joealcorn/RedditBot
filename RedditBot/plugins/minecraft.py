@@ -56,6 +56,7 @@ def get_info(host='localhost', port=25565):
         # Connect
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((host, port))
+        s.settimeout(2)
 
         # Send handshake + status request
         s.send(pack_data("\x00\x00" + pack_data(host.encode('utf8')) + pack_port(port) + "\x01"))
